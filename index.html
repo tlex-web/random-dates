@@ -5,7 +5,11 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./src/css/style.css">
+  <link rel="icon" type="image/x-icon" href="./src/img/AVEGA-Favicon.jpg">
   <title>Random Date Sampling</title>
 </head>
 
@@ -13,22 +17,30 @@
   <div class="container">
 
     <div class="content">
-      <div class="content-header"></div>
+      <div class="content-header">
+        <h1 class="content-header-title">Random Dates Sampler</h1>
+      </div>
       <div class="content-input">
-        <div class="form-container">
-          <form action="#" class="form">
-            <input type="date" name="startDate" id="startDate">
+        <form action="#" class="form">
+
+          <div class="input-container">
             <label for="startDate">Start Date: </label>
-
-            <input type="date" name="endDate" id="endDate">
+            <input type="date" name="startDate" id="startDate">
+            <span class="error"></span>
+          </div>
+          <div class="input-container">
             <label for="endDate">End Date: </label>
-
-            <input type="number" name="count" id="count">
+            <input type="date" name="endDate" id="endDate">
+            <span class="error"></span>
+          </div>
+          <div class="input-container">
             <label for="count">Count: </label>
-
-            <button type="submit">Submit</button>
-          </form>
-        </div>
+            <input type="number" name="count" id="count" placeholder="0">
+            <span class="error"></span>
+          </div>
+          <button type="submit" class="btn">Submit</button>
+          <span class="error"></span>
+        </form>
       </div>
       <div class="content-output">
         <div class="output-field">
@@ -40,7 +52,7 @@
 
 
 
-  <script src="./src/js/main.js"></script>
+  <script src="./src/js/index.js"></script>
 </body>
 
 </html>
