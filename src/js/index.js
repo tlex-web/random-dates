@@ -67,24 +67,39 @@ const getDatesInRange = (start, end, n) => {
         arr.push(new Date(dt))
     }
 
+    if (!arr) throw new Error("Couldn't create batch")
+
     return arr
 }
 
+/**
+ * Create a n sized batch with random dates
+ * @param {Date[]} dates
+ * @param {Number} n
+ * @returns Dates[]
+ */
 const createRandomSampleBatch = (dates, n) => {
-    if (!dates) throw new Error("Couldn't create batch")
+    const len = dates.length
+    const seed = getRandomInteger(2, len)
+    const batch = Array(n)
 
-    const seed = Math.round(Math.random() * n)
-
-    dates.shuffle()
-}
-
-const shuffle = () => {
-    const len = arr.length
-    const even = len % 2 == 0 ? true : false
+    const even = len % 2 === 0 ? true : false
 
     if (!even) {
         const rest = 1
     }
 
-    for (let i = 0; i <= Array.length; ++i) {}
+    for (let i = 0; i <= len; ++i) {}
+
+    return batch
+}
+
+/**
+ * Generate a random number between two numbers, including min and max
+ * @param {Number} min
+ * @param {Number} max
+ * @returns Number
+ */
+const getRandomInteger = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min
 }
