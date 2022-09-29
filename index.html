@@ -1,62 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="./src/css/style.css" />
+        <link
+            rel="icon"
+            type="image/x-icon"
+            href="./src/img/AVEGA-Favicon.jpg"
+        />
+        <title>Random Date Sampling</title>
+    </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./src/css/style.css">
-  <link rel="icon" type="image/x-icon" href="./src/img/AVEGA-Favicon.jpg">
-  <title>Random Date Sampling</title>
-</head>
-
-<body>
-  <div class="container">
-
-    <div class="content">
-      <div class="content-header">
-        <h1 class="content-header-title">Random Dates Sampler</h1>
-      </div>
-      <div class="content-input">
-        <form action="#" class="form">
-
-          <div class="input-container">
-            <label for="startDate">Start Date: </label>
-            <input type="date" name="startDate" id="startDate">
-            <span class="error"></span>
-          </div>
-          <div class="input-container">
-            <label for="endDate">End Date: </label>
-            <input type="date" name="endDate" id="endDate">
-            <span class="error"></span>
-          </div>
-          <div class="input-container">
-            <label for="count">Count: </label>
-            <input type="number" name="count" id="count" placeholder="0">
-            <span class="error"></span>
-          </div>
-          <button type="submit" class="btn">Submit</button>
-          <span class="error"></span>
-        </form>
-      </div>
-      <div class="content-output">
-        <div class="output-field">
-          <div class="output">
-            <ul class="output-list">
-              
-            </ul>
+    <body>
+        <div class="container">
+            <div class="content">
+                <div class="content-header">
+                    <h1 class="content-header-title">Random Dates Sampler</h1>
+                </div>
+                <div class="content-input">
+                    <form class="form">
+                        <div class="input-container">
+                            <label for="startDate">Start Date:</label>
+                            <input
+                                type="date"
+                                name="startDate"
+                                id="startDate"
+                            />
+                            <span class="error"></span>
+                        </div>
+                        <div class="input-container">
+                            <label for="endDate">End Date:</label>
+                            <input type="date" name="endDate" id="endDate" />
+                            <span class="error"></span>
+                        </div>
+                        <div class="input-container">
+                            <label for="count">Count:</label>
+                            <input
+                                type="number"
+                                name="count"
+                                id="count"
+                                placeholder="0"
+                            />
+                            <span class="error"></span>
+                        </div>
+                        <div class="input-container">
+                            <label for="weekend">Exclude weekend days:</label>
+                            <input
+                                type="checkbox"
+                                name="weekend"
+                                id="weekend"
+                                checked
+                            />
+                            <span class="error"></span>
+                        </div>
+                        <div class="input-btn">
+                            <button type="submit" class="btn">Submit</button>
+                            <a class="btn copy hidden">Copy</a>
+                        </div>
+                        <span class="error"></span>
+                    </form>
+                </div>
+            </div>
+            <div class="output hidden">
+                <ul class="output-list hidden"></ul>
+            </div>
         </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-
-
-  <script src="./src/js/index.js"></script>
-</body>
-
+        <script src="./src/js/index.js"></script>
+    </body>
 </html>

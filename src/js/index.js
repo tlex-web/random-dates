@@ -2,13 +2,30 @@
 // within a range of two dates
 
 const form = document.querySelector('form')
+const outputList = document.querySelector('.output-list')
+const copyBtn = document.querySelector('.copy')
+const submitBtn = document.querySelector('button')
+
+const outputField = document.querySelectorAll('.hidden')
+
+copyBtn.addEventListener('click', async e => {
+    e.preventDefault()
+
+    await navigator.clipboard.writeText('ffff')
+})
+
+submitBtn.addEventListener('click', e => {
+    outputField.forEach(field => {
+        if (field.classList.contains('hidden')) field.classList.remove('hidden')
+    })
+})
 
 form.addEventListener('submit', e => {
     e.preventDefault()
 
     const errorFields = document.querySelectorAll('.error')
 
-    const { startDate, endDate, count } = e.target
+    const { startDate, endDate, count, weekend } = e.target
 
     const start =
         startDate.value.length !== 0
@@ -17,6 +34,7 @@ form.addEventListener('submit', e => {
     const end =
         endDate.value.length !== 0 ? new Date(String(endDate.value)) : undefined
     const n = +count.value
+    const excludeWeekend = weekend.checked ? true : false
 
     try {
         // check if the dates have been provided
@@ -38,24 +56,35 @@ form.addEventListener('submit', e => {
         console.log('error')
     }
 
-    const dates = getDatesInRange(new Date(start), new Date(end), n)
+    const dates = getDatesInRange(
+        new Date(start),
+        new Date(end),
+        n,
+        excludeWeekend
+    )
 
-    console.log(dates)
+    const batch = createRandomSampleBatch(dates, n)
+    const output = []
 
-    const li = `<li>${date}</li>`
+    batch.forEach(date => {
+        output.push(`<li>${date.toString().slice()}</li>`)
+    })
+
+    console.log(output.join(' '))
+
+    outputList.innerHTML = output.join(' ')
 })
 
 /**
  * Returns all dates between start and end date
  * @param {Date} start
  * @param {Date} end
- * @param {Number} n
+ * @param {Boolean} excludeWeekend
  * @returns Date[]
  */
-const getDatesInRange = (start, end, n) => {
+const getDatesInRange = (start, end, excludeWeekend) => {
     if (typeof start !== 'object') throw new Error('DateType')
     if (typeof end !== 'object') throw new Error('DateType')
-    if (typeof n !== 'number') throw new Error('DateType')
 
     const arr = []
 
@@ -64,42 +93,56 @@ const getDatesInRange = (start, end, n) => {
         dt <= new Date(end);
         dt.setDate(dt.getDate() + 1)
     ) {
-        arr.push(new Date(dt))
+        if (excludeWeekend) {
+            if (
+                dt.toString().slice(0, 3) !== 'Sat' &&
+                dt.toString().slice(0, 3) !== 'Sun'
+            )
+                arr.push(new Date(dt))
+        } else {
+            arr.push(new Date(dt))
+        }
     }
 
-    if (!arr) throw new Error("Couldn't create batch")
+    if (!arr?.length) throw new Error("Couldn't create batch")
 
     return arr
 }
 
 /**
- * Create a n sized batch with random dates
+ * Create a batch with randomly selected dates of the size n
  * @param {Date[]} dates
  * @param {Number} n
  * @returns Dates[]
  */
 const createRandomSampleBatch = (dates, n) => {
-    const len = dates.length
-    const seed = getRandomInteger(2, len)
-    const batch = Array(n)
+    let len = dates.length
 
-    const even = len % 2 === 0 ? true : false
+    // const even = len % 2 === 0 ? true : false
 
-    if (!even) {
-        const rest = 1
+    // if (!even) {
+    //     const rest = 1
+
+    //     len = len - rest
+    // }
+
+    let batch = []
+
+    for (let i = 1; i <= n; ++i) {
+        const seed = getRandomInteger(0, len)
+
+        batch.push(dates[seed])
     }
-
-    for (let i = 0; i <= len; ++i) {}
 
     return batch
 }
 
 /**
- * Generate a random number between two numbers, including min and max
+ * Generate a random number between two numbers, including min and excluding amx
  * @param {Number} min
  * @param {Number} max
  * @returns Number
  */
 const getRandomInteger = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min
+    return Math.floor(Math.random() * (max - min)) + min
 }

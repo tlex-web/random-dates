@@ -1,4 +1,3 @@
-
 *,
 *::before,
 *::after {
@@ -8,7 +7,7 @@
 }
 
 html {
-    font-size: 62,5%;
+    font-size: 62, 5%;
     scroll-behavior: smooth;
 }
 
@@ -20,10 +19,12 @@ body {
 
 a {
     text-decoration: none;
+    color: #333;
 }
 
 .container {
     padding: 0 5rem;
+    overflow: hidden;
     max-width: 1250px;
 }
 
@@ -37,35 +38,32 @@ a {
 }
 
 .content-header {
-  height: 25vh;
-
+    height: 25vh;
 }
 
 .content-header-title {
-  margin-top: 3rem;
-  text-align: center;
+    margin-top: 3rem;
+    text-align: center;
 }
 
 .content-input {
-
-  height: 75vh;
-  width: 70vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    height: 75vh;
+    width: 70vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .form {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-
 .btn {
-    padding: .5rem 1rem;
+    padding: 0.5rem 1rem;
     text-align: center;
     font-size: 2rem;
     width: 15rem;
@@ -73,8 +71,8 @@ a {
     cursor: pointer;
     border: none;
     border-radius: 0.25rem;
-    box-shadow: 10px, 10px, 5px, rgba(0,0,0,.5);
-    transition: all .5s ease-in-out;
+    box-shadow: 10px, 10px, 5px, rgba(0, 0, 0, 0.5);
+    transition: all 0.5s ease-in-out;
 }
 
 .btn:hover {
@@ -92,27 +90,26 @@ a {
     transform: translateX(0);
 }
 
-button[type="submit"] {
-
-  margin-top: 5rem;
-}
-
 input {
     background: #f4f4f4;
     padding: 1rem 2rem;
-    margin: .5rem 0;
+    margin: 0.5rem 0;
     -webkit-appearance: none;
     border: none;
-    box-shadow: 10px, 10px, 5px, rgba(0,0,0,.5);
+    box-shadow: 10px, 10px, 5px, rgba(0, 0, 0, 0.5);
     font-size: 1.5rem;
     color: #333;
 }
 
+input[type='checkbox'] {
+    appearance: checkbox;
+}
+
 .input-container {
-  display: grid;
-  width: 100%;
-  grid-template-columns: repeat(2, 1fr);
-  align-items: center;
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: center;
 }
 
 input:not(label):hover {
@@ -121,11 +118,41 @@ input:not(label):hover {
 }
 
 .input:active {
-  border: none;
+    border: none;
+}
+
+.input-btn {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 5rem;
 }
 
 .error {
+    font-size: 1rem;
+    color: #ff4444;
+}
 
-  font-size: 1rem;
-  color: #ff4444;
+.output {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.output-list {
+    display: grid;
+    grid-template-columns: repeat(2, 2fr);
+    justify-content: center;
+    gap: 3rem;
+    align-items: center;
+}
+
+li {
+    list-style: none;
+}
+
+.hidden {
+    display: none;
 }
