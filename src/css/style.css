@@ -7,7 +7,6 @@
 }
 
 html {
-    font-size: 62, 5%;
     scroll-behavior: smooth;
 }
 
@@ -23,9 +22,7 @@ a {
 }
 
 .container {
-    padding: 0 5rem;
     overflow: hidden;
-    max-width: 1250px;
 }
 
 .content {
@@ -34,7 +31,7 @@ a {
     align-items: center;
     justify-content: center;
     height: 100vh;
-    width: 100vw;
+    width: 100%;
 }
 
 .content-header {
@@ -48,7 +45,7 @@ a {
 
 .content-input {
     height: 75vh;
-    width: 70vw;
+    width: 70%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -94,6 +91,7 @@ input {
     background: #f4f4f4;
     padding: 1rem 2rem;
     margin: 0.5rem 0;
+    appearance: none;
     -webkit-appearance: none;
     border: none;
     box-shadow: 10px, 10px, 5px, rgba(0, 0, 0, 0.5);
@@ -135,22 +133,29 @@ input:not(label):hover {
 
 .output {
     height: 100vh;
-    width: 100vw;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 5rem 0;
 }
 
 .output-list {
     display: grid;
-    grid-template-columns: repeat(2, 2fr);
+    height: 100%;
+    width: 100%;
+    grid-template-columns: repeat(5, 1fr);
     justify-content: center;
     gap: 3rem;
     align-items: center;
+    margin: 0 5rem;
+    padding: 2rem 2rem;
+    border: 2px solid rgba(0, 0, 0, 0.5);
+    border-radius: 1rem;
 }
 
 li {
     list-style: none;
+    font-size: 1rem;
 }
 
 .hidden {
