@@ -10,18 +10,6 @@ class randomDateSampler {
      * @param {NodeList} errorFields
      */
     constructor(start, end, batchSize, weekend, errorFields) {
-        this._start = start
-        this._end = end
-        this._batchSize = batchSize
-        this._weekend = weekend
-        this._errorFields = errorFields
-        this._batch = []
-        this._output = []
-        this.constructor.init()
-    }
-
-    static init = () => {
-        console.log(this._weekend)
         this._start =
             startDate.value.length !== 0
                 ? new Date(String(startDate.value))
@@ -30,9 +18,15 @@ class randomDateSampler {
             endDate.value.length !== 0
                 ? new Date(String(endDate.value))
                 : undefined
-        this._batchSize = +this._batchSize.value
-        this._excludeWeekend = weekend.checked ? true : false
+        this._batchSize = +batchSize.value
+        this._weekend = weekend.checked ? true : false
+        this._errorFields = errorFields
+        this._batch = []
+        this._output = []
+        this.constructor.init()
     }
+
+    static init = () => {}
 
     checkInput = () => {
         // check if the dates have been provided
@@ -118,6 +112,8 @@ class randomDateSampler {
         for (let i = 1; i <= n; ++i) {
             const seed = getRandomInteger(0, n)
 
+            // Check if the index of the date has already been picked,
+            // since the filtering for dates is a unreliable
             if (!seeds.includes(seed)) batch.push(dates[seed])
 
             seeds.push(seed)

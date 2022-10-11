@@ -27,8 +27,6 @@ form.addEventListener('submit', e => {
 
     const { startDate, endDate, batchSize, weekend } = e.target
 
-    console.log(startDate, endDate, batchSize, weekend)
-
     const randomDate = new randomDateSampler(
         startDate,
         endDate,
@@ -37,9 +35,10 @@ form.addEventListener('submit', e => {
         errorFields
     )
 
-    randomDate.checkInput()
+    const t = randomDate.checkInput()
+    console.log(t)
 
-    randomDate.createOutput()
+    //randomDate.createOutput()
 
-    outputList.innerHTML = output.join(' ')
+    //outputList.innerHTML = output.join(' ')
 })
