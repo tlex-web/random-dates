@@ -1,6 +1,8 @@
 // JavaScript driver code to create a random sample batch of dates
 // within a range of two dates
 
+'use-strict'
+
 const form = document.querySelector('form')
 const outputList = document.querySelector('.output-list')
 const copyBtn = document.querySelector('.copy')
@@ -17,6 +19,8 @@ copyBtn.addEventListener('click', async e => {
 })
 
 submitBtn.addEventListener('click', e => {
+    e.preventDefault()
+
     outputField.forEach(field => {
         if (field.classList.contains('hidden')) field.classList.remove('hidden')
     })
@@ -35,10 +39,9 @@ form.addEventListener('submit', e => {
         errorFields
     )
 
-    const t = randomDate.checkInput()
-    console.log(t)
+    console.log(randomDate.init())
 
-    //randomDate.createOutput()
+    const output = randomDate.createOutput()
 
-    //outputList.innerHTML = output.join(' ')
+    outputList.innerHTML = output.join(' ')
 })

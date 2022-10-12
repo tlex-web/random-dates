@@ -11,41 +11,71 @@ class randomDateSampler {
      */
     constructor(start, end, batchSize, weekend, errorFields) {
         this._start =
-            startDate.value.length !== 0
-                ? new Date(String(startDate.value))
-                : undefined
+            start.value.length !== 0 ? new Date(String(start.value)) : undefined
         this._end =
-            endDate.value.length !== 0
-                ? new Date(String(endDate.value))
-                : undefined
+            end.value.length !== 0 ? new Date(String(end.value)) : undefined
         this._batchSize = +batchSize.value
         this._weekend = weekend.checked ? true : false
         this._errorFields = errorFields
         this._batch = []
         this._output = []
-        this.constructor.init()
+        this._isError = false
     }
-
-    static init = () => {}
 
     checkInput = () => {
         // check if the dates have been provided
-        if (!this._start) this._errorFields[0].innerHTML = 'Provide a date'
-        if (!this._end) this._errorFields[1].innerHTML = 'Provide a date'
+        if (!this._start) throw new DateError('Provide a date', 0)
+        if (!this._end) throw new DateError('Provide a date', 1)
 
         // check if the end date is greater than the start date
         if (this._start.valueOf() > this._end.valueOf())
-            this._errorFields[2].innerHTML = `${this._end} needs to be greater than ${this._start}`
+            throw new DateError(
+                `${this._end
+                    .toString()
+                    .slice(0, 10)} needs to be greater than ${this._start
+                    .toString()
+                    .slice(0, 10)}`,
+                [0, 1]
+            )
 
         // check if the dates have the same value
         if (+this._start === +this._end)
-            this._errorFields.forEach(
-                el => (el.innerHTML = 'Define a valid range')
-            )
+            throw new DateError('Define a valid range', [0, 1])
 
         // check if a number is provided
         if (this._batchSize <= 0)
-            this._errorFields[2].innerHTML = 'Sample needs to be greater than 0'
+            throw new DateError('Sample needs to be greater than 0', 2)
+    }
+
+    init() {
+        console.log(1)
+        while (true) {
+            try {
+                this.checkInput()
+            } catch (error) {
+                const { message, field } = error
+                console.log(error)
+
+                if (typeof field === 'object') {
+                    this._isError = true
+
+                    field.forEach(e => {
+                        this._errorFields[+e].innerHTML = message
+                    })
+                } else {
+                    this._isError = true
+                    const n = +field
+
+                    this._errorFields[n].innerHTML = message
+                }
+            }
+
+            if (!this._isError) break
+        }
+    }
+
+    print() {
+        return [this._start, this._end, this._weekend, this._batchSize]
     }
 
     /**
@@ -136,6 +166,10 @@ class randomDateSampler {
         return Math.floor(Math.random() * (max - min)) + min
     }
 
+    /**
+     * Create the output element containing the date batch
+     * @returns Array of HTML elements
+     */
     createOutput = () => {
         const dates = getDatesInRange(
             new Date(start),
@@ -148,5 +182,7 @@ class randomDateSampler {
         batch.forEach(date => {
             output.push(`<li>${date.toString().slice(0, 16)}</li>`)
         })
+
+        return output
     }
 }
