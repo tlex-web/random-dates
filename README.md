@@ -16,7 +16,11 @@
 
     All tests were written using the mocha framework. To run all tests in the test folder use `npm run tests`
 
-4. Dev Dependencies
+4. Minimize JS
+
+    To minimize the JavaScript code inside the _index.js_ file and create a source map for debugging run `npm run compile`
+
+5. Dev Dependencies
     - eslint
     - mocha
     - request
