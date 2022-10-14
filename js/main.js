@@ -225,7 +225,6 @@ class RandomDateSampler {
 // Import all HTML elements
 const form = document.querySelector('form')
 const outputList = document.querySelector('.output-list')
-const submitBtn = document.querySelector('button[type="submit"]')
 const clipboard = document.querySelector('#clipboard')
 const txt = document.querySelector('#txt')
 const csv = document.querySelector('#csv')
@@ -328,7 +327,8 @@ const saveDataAsCSV = (filename, data) => {
 }
 
 // under development
-const saveDataAsXlsx = data => {
+// eslint-disable-next-line no-unused-vars
+const saveDataAsXlsx = (filename, data) => {
     function s2ab(s) {
         const buffer = new ArrayBuffer(s.length)
         const view = new Uint8Array(buffer)
@@ -339,8 +339,12 @@ const saveDataAsXlsx = data => {
         type: '',
     })
 
-    href = URL.createObjectURL(blob)
+    const tmpAnchor = window.document.createElement('a')
+    tmpAnchor.href = window.URL.createObjectURL(blob, { oneTimeOnly: true })
+    tmpAnchor.download = filename
+    tmpAnchor.click()
+    URL.revokeObjectURL(tmpAnchor.href)
 }
 
-// throws unsafe environment errors
+// throws an unsafe environment error
 //history.replaceState(null, '', '../index.html')
