@@ -1,0 +1,23 @@
+{
+    "name": "random-dates",
+    "version": "1.0.0",
+    "description": "application to create a batch of random dates",
+    "main": "index.js",
+    "scripts": {
+        "eslint:init": "npm init @eslint/config",
+        "eslint:run": "eslint"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/itauditresources/random-dates.git"
+    },
+    "author": "Tim Lui",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/itauditresources/random-dates/issues"
+    },
+    "homepage": "https://github.com/itauditresources/random-dates#readme",
+    "devDependencies": {
+        "eslint": "^8.25.0"
+    }
+}

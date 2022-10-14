@@ -6,7 +6,7 @@ class DateError extends Error {
      * gets the number of the field where the error occurs
      * to show the message in the frontend
      * @param {String} message
-     * @param {Number|Array} field
+     * @param {Number | Number[]} field
      */
     constructor(message, field) {
         super(message)

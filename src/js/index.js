@@ -18,14 +18,6 @@ copyBtn.addEventListener('click', async e => {
     await navigator.clipboard.writeText('ffff')
 })
 
-submitBtn.addEventListener('click', e => {
-    e.preventDefault()
-
-    outputField.forEach(field => {
-        if (field.classList.contains('hidden')) field.classList.remove('hidden')
-    })
-})
-
 form.addEventListener('submit', e => {
     e.preventDefault()
 
@@ -38,10 +30,24 @@ form.addEventListener('submit', e => {
         weekend,
         errorFields
     )
+    const initialize = randomDate.init()
+    console.log(initialize)
 
-    console.log(randomDate.init())
+    if (!initialize) return
 
     const output = randomDate.createOutput()
 
+    if (randomDate.error) location.reload()
+
+    console.log(output)
+    if (!randomDate.error || !output?.length) {
+        outputField.forEach(field => {
+            if (field.classList.contains('hidden'))
+                field.classList.remove('hidden')
+        })
+    }
+
     outputList.innerHTML = output.join(' ')
 })
+
+//history.replaceState(null, '', '../index.html')

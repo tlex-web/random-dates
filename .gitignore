@@ -1,6 +1,8 @@
 
-.replit
-
-replit.nix
-
+# vs-code files
 .vscode
+
+# node files
+
+node_modules
+

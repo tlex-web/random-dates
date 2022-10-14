@@ -22,6 +22,10 @@ class randomDateSampler {
         this._isError = false
     }
 
+    get error() {
+        return this._isError
+    }
+
     checkInput = () => {
         // check if the dates have been provided
         if (!this._start) throw new DateError('Provide a date', 0)
@@ -45,33 +49,42 @@ class randomDateSampler {
         // check if a number is provided
         if (this._batchSize <= 0)
             throw new DateError('Sample needs to be greater than 0', 2)
+
+        if (
+            this.getDatesInRange(
+                new Date(this._start),
+                new Date(this._end),
+                this._weekend
+            ).length < this._batchSize
+        )
+            throw new DateError(
+                'Extend the time frame or pick a lower sample size',
+                [0, 1, 2, 3]
+            )
     }
 
     init() {
-        console.log(1)
-        while (true) {
-            try {
-                this.checkInput()
-            } catch (error) {
-                const { message, field } = error
-                console.log(error)
+        try {
+            this.checkInput()
+        } catch (error) {
+            const { message, field } = error
 
-                if (typeof field === 'object') {
-                    this._isError = true
+            if (typeof field === 'object') {
+                this._isError = true
 
-                    field.forEach(e => {
-                        this._errorFields[+e].innerHTML = message
-                    })
-                } else {
-                    this._isError = true
-                    const n = +field
+                field.forEach(e => {
+                    this._errorFields[+e].innerHTML = message
+                })
+            } else {
+                this._isError = true
+                const n = +field
 
-                    this._errorFields[n].innerHTML = message
-                }
+                this._errorFields[n].innerHTML = message
             }
-
-            if (!this._isError) break
         }
+
+        if (this._isError) return false
+        else return true
     }
 
     print() {
@@ -92,7 +105,7 @@ class randomDateSampler {
         const arr = []
 
         for (
-            dt = new Date(start);
+            let dt = new Date(start);
             dt <= new Date(end);
             dt.setDate(dt.getDate() + 1)
         ) {
@@ -107,7 +120,7 @@ class randomDateSampler {
             }
         }
 
-        if (!arr?.length) throw new Error("Couldn't create batch")
+        if (!arr?.length) throw new DateError("Couldn't create batch", 2)
 
         return arr
     }
@@ -119,15 +132,6 @@ class randomDateSampler {
      * @returns Dates[]
      */
     createRandomSampleBatch = (dates, n) => {
-        try {
-            if (dates.length !== n)
-                throw new Error(
-                    'Extend the time frame or pick a lower sample size'
-                )
-        } catch (err) {
-            errorFields[2].innerHTML = err
-        }
-
         // const even = len % 2 === 0 ? true : false
 
         // if (!even) {
@@ -138,20 +142,25 @@ class randomDateSampler {
 
         let batch = []
         let seeds = []
+        let availableDates = dates.length
 
-        for (let i = 1; i <= n; ++i) {
-            const seed = getRandomInteger(0, n)
+        for (let i = 1; i <= availableDates; ++i) {
+            const seed = this.getRandomInteger(0, availableDates)
 
             // Check if the index of the date has already been picked,
             // since the filtering for dates is a unreliable
             if (!seeds.includes(seed)) batch.push(dates[seed])
 
+            if (batch.length === n) break
+
             seeds.push(seed)
         }
 
         if (batch.length !== n)
-            errorFields[2].innerHTML =
-                'Extend the time frame or pick a lower sample size'
+            throw new DateError(
+                'Extend the time frame or pick a lower sample size',
+                2
+            )
 
         return batch
     }
@@ -171,12 +180,22 @@ class randomDateSampler {
      * @returns Array of HTML elements
      */
     createOutput = () => {
-        const dates = getDatesInRange(
-            new Date(start),
-            new Date(end),
-            excludeWeekend
-        )
-        const batch = createRandomSampleBatch(dates, n)
+        let batch = []
+        try {
+            const dates = this.getDatesInRange(
+                new Date(this._start),
+                new Date(this._end),
+                this._weekend
+            )
+
+            batch = this.createRandomSampleBatch(dates, this._batchSize)
+        } catch (error) {
+            const { message, field } = error
+
+            this._isError = true
+            this._errorFields[+field].innerHTML = message
+        }
+
         const output = []
 
         batch.forEach(date => {
