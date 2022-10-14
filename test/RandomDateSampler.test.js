@@ -1,5 +1,5 @@
 const assert = require('node:assert').strict
-const RandomDateSampler = require('../src/js/RandomDateSampler')
+const RandomDateSampler = require('../dev/src/js/RandomDateSampler')
 
 const randInt = RandomDateSampler.getRandomInteger
 const createRanB = RandomDateSampler.createRandomBatch

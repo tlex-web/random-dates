@@ -70,7 +70,6 @@
                         </div>
                         <div class="input-btn">
                             <button type="submit" class="btn">Submit</button>
-                            <a class="btn copy hidden">Copy</a>
                         </div>
                         <span class="error"></span>
                     </form>
@@ -78,11 +77,14 @@
             </div>
             <div class="output hidden">
                 <ul class="output-list hidden"></ul>
+                <div class="copy-btn">
+                    <a id="clipboard" class="btn copy hidden">Copy</a>
+                    <a id="txt" class="btn copy hidden">Export as .txt</a>
+                    <a id="csv" class="btn copy hidden">Export as .csv</a>
+                </div>
             </div>
         </div>
 
-        <script src="./src/js/DateError.js"></script>
-        <script src="./src/js/randomDate.js"></script>
-        <script src="./src/js/index.js"></script>
+        <script src="./src/js/main.min.js"></script>
     </body>
 </html>

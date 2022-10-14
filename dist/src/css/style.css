@@ -134,28 +134,43 @@ input:not(label):hover {
 .output {
     height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 5rem 0;
+    padding: 2rem 0;
 }
 
 .output-list {
     display: grid;
-    height: 100%;
-    width: 100%;
+    height: auto;
+    width: auto;
+    max-height: 100%;
     grid-template-columns: repeat(5, 1fr);
     justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
     gap: 3rem;
     align-items: center;
-    margin: 0 5rem;
+    margin-bottom: 2rem;
     padding: 2rem 2rem;
-    border: 2px solid rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(0, 0, 0, 0.8);
     border-radius: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.5) 3px 5px;
 }
 
 li {
     list-style: none;
     font-size: 1rem;
+}
+
+.copy-btn {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 80%;
+}
+
+.copy {
+    font-size: 1.5rem;
 }
 
 .hidden {
