@@ -1,6 +1,6 @@
 'use-strict'
 
-class randomDateSampler {
+class RandomDateSampler {
     /**
      * Random date constructor class
      * @param {HTMLInputElement} start

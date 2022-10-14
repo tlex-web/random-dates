@@ -23,7 +23,7 @@ form.addEventListener('submit', e => {
 
     const { startDate, endDate, batchSize, weekend } = e.target
 
-    const randomDate = new randomDateSampler(
+    const randomDate = new RandomDateSampler(
         startDate,
         endDate,
         batchSize,
