@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            rel="icon"
+            type="image/x-icon"
+            href="./src/img/AVEGA-Favicon.jpg"
+        />
+        <title>Random Date Sampling - Test</title>
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="content">
+                <div class="content-header">
+                    <h1 class="content-header-title">Random Dates Sampler</h1>
+                </div>
+                <div class="content-input">
+                    <form class="form">
+                        <div class="input-container">
+                            <label for="startDate">Start Date:</label>
+                            <input
+                                type="date"
+                                name="startDate"
+                                id="startDate"
+                                required
+                            />
+                            <span class="error"></span>
+                        </div>
+                        <div class="input-container">
+                            <label for="endDate">End Date:</label>
+                            <input
+                                type="date"
+                                name="endDate"
+                                id="endDate"
+                                required
+                            />
+                            <span class="error"></span>
+                        </div>
+                        <div class="input-container">
+                            <label for="batchSize">Batch size:</label>
+                            <input
+                                type="number"
+                                name="batchSize"
+                                id="batchSize"
+                                placeholder="0"
+                                required
+                            />
+                            <span class="error"></span>
+                        </div>
+                        <div class="input-container">
+                            <label for="weekend">Exclude weekend days:</label>
+                            <input
+                                type="checkbox"
+                                name="weekend"
+                                id="weekend"
+                                checked
+                            />
+                            <span class="error"></span>
+                        </div>
+                        <div class="input-btn">
+                            <button type="submit" class="btn">Submit</button>
+                        </div>
+                        <span class="error"></span>
+                    </form>
+                </div>
+            </div>
+            <div class="output hidden">
+                <ul class="output-list hidden"></ul>
+                <div class="copy-btn">
+                    <a id="clipboard" class="btn copy hidden">Copy</a>
+                    <a id="txt" class="btn copy hidden">Export as .txt</a>
+                    <a id="csv" class="btn copy hidden">Export as .csv</a>
+                </div>
+            </div>
+        </div>
+
+        <script src="./DateError.js"></script>
+        <script src="./RandomDateSampler.js"></script>
+        <script src="./index.js"></script>
+    </body>
+</html>

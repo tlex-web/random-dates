@@ -197,10 +197,23 @@ class RandomDateSampler {
             this._errorFields[+field].innerHTML = message
         }
 
+        // get the number of the month by providing the month as a 3 characters string
+        let monthNumberFromString = str => {
+            return new Date(`${str} 01 2000`).toLocaleDateString(`en`, {
+                month: `2-digit`,
+            })
+        }
+
         const output = []
 
         batch.forEach(date => {
-            output.push(`<li>${date.toString().slice(0, 16)}</li>`)
+            let reformattedDate = `${date
+                .toString()
+                .slice(8, 10)}/${monthNumberFromString(
+                date.toString().slice(4, 8)
+            )}/${date.toString().slice(11, 16)}`
+
+            output.push(`<li>${reformattedDate}</li>`)
         })
 
         return { html_output: output, dates: batch }
