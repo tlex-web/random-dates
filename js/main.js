@@ -1,5 +1,41 @@
 'use-strict'
 
+class DateError extends Error {
+    /**
+     * Custom error class for the random date application
+     * gets the number of the field where the error occurs
+     * to show the message in the frontend
+     * @param {String} message
+     * @param {Number | Number[]} field
+     */
+    constructor(message, field) {
+        super(message)
+
+        this.field = field
+    }
+}
+
+/**
+ * get the number of the month by providing the month as a 3 characters string
+ * @param {String} month
+ * @returns Number
+ */
+let monthNumberFromString = month => {
+    return new Date(`${month} 01 2000`).toLocaleDateString(`en`, {
+        month: `2-digit`,
+    })
+}
+
+/**
+ * Generate a random number between two numbers, including min and excluding max
+ * @param {Number} min
+ * @param {Number} max
+ * @returns Number
+ */
+const getRandomInteger = (min, max) => {
+    return Math.floor(Math.random() * (max - min)) + min
+}
+
 class RandomDateSampler {
     /**
      * Random date constructor class
@@ -146,7 +182,7 @@ class RandomDateSampler {
         let availableDates = dates.length
 
         for (let i = 1; i <= availableDates; ++i) {
-            const seed = this.getRandomInteger(0, availableDates)
+            const seed = getRandomInteger(0, availableDates)
 
             // Check if the index of the date has already been picked,
             // since the filtering for dates is a unreliable
@@ -164,16 +200,6 @@ class RandomDateSampler {
             )
 
         return batch
-    }
-
-    /**
-     * Generate a random number between two numbers, including min and excluding max
-     * @param {Number} min
-     * @param {Number} max
-     * @returns Number
-     */
-    getRandomInteger = (min, max) => {
-        return Math.floor(Math.random() * (max - min)) + min
     }
 
     /**
@@ -197,13 +223,6 @@ class RandomDateSampler {
             this._errorFields[+field].innerHTML = message
         }
 
-        // get the number of the month by providing the month as a 3 characters string
-        let monthNumberFromString = str => {
-            return new Date(`${str} 01 2000`).toLocaleDateString(`en`, {
-                month: `2-digit`,
-            })
-        }
-
         const output = []
 
         batch.forEach(date => {
@@ -223,6 +242,7 @@ class RandomDateSampler {
 // Import all HTML elements
 const form = document.querySelector('form')
 const outputList = document.querySelector('.output-list')
+const submitBtn = document.querySelector('button[type="submit"]')
 const clipboard = document.querySelector('#clipboard')
 const txt = document.querySelector('#txt')
 const csv = document.querySelector('#csv')
@@ -261,13 +281,20 @@ form.addEventListener('submit', e => {
     outputList.innerHTML = html_output.join(' ')
 
     // reformat the data for export
-    const prepDataExport = dates.map(e => e.toString().slice(0, 16))
+    const prepDataExport = dates.map(
+        e =>
+            `${e.toString().slice(8, 10)}/${monthNumberFromString(
+                e.toString().slice(4, 8)
+            )}/${e.toString().slice(11, 16)}`
+    )
 
     // different export types
     clipboard.addEventListener('click', async e => {
         e.preventDefault()
 
-        await navigator.clipboard.writeText(prepDataExport)
+        await navigator.clipboard.writeText(
+            prepDataExport.join(' ,').replaceAll(' ,', '')
+        )
 
         clipboard.innerHTML = 'Copied to clipboard'
     })
@@ -275,7 +302,10 @@ form.addEventListener('submit', e => {
     txt.addEventListener('click', async e => {
         e.preventDefault()
 
-        saveDataAsTXT('random_dates.txt', prepDataExport)
+        saveDataAsTXT(
+            'random_dates.txt',
+            prepDataExport.join(' ,').replaceAll(' ,', '')
+        )
     })
 
     csv.addEventListener('click', async e => {
@@ -325,8 +355,7 @@ const saveDataAsCSV = (filename, data) => {
 }
 
 // under development
-// eslint-disable-next-line no-unused-vars
-const saveDataAsXlsx = (filename, data) => {
+const saveDataAsXlsx = data => {
     function s2ab(s) {
         const buffer = new ArrayBuffer(s.length)
         const view = new Uint8Array(buffer)
@@ -337,12 +366,8 @@ const saveDataAsXlsx = (filename, data) => {
         type: '',
     })
 
-    const tmpAnchor = window.document.createElement('a')
-    tmpAnchor.href = window.URL.createObjectURL(blob, { oneTimeOnly: true })
-    tmpAnchor.download = filename
-    tmpAnchor.click()
-    URL.revokeObjectURL(tmpAnchor.href)
+    href = URL.createObjectURL(blob)
 }
 
-// throws an unsafe environment error
+// throws unsafe environment errors
 //history.replaceState(null, '', '../index.html')

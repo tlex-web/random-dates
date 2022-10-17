@@ -146,7 +146,7 @@ class RandomDateSampler {
         let availableDates = dates.length
 
         for (let i = 1; i <= availableDates; ++i) {
-            const seed = this.getRandomInteger(0, availableDates)
+            const seed = getRandomInteger(0, availableDates)
 
             // Check if the index of the date has already been picked,
             // since the filtering for dates is a unreliable
@@ -164,16 +164,6 @@ class RandomDateSampler {
             )
 
         return batch
-    }
-
-    /**
-     * Generate a random number between two numbers, including min and excluding max
-     * @param {Number} min
-     * @param {Number} max
-     * @returns Number
-     */
-    getRandomInteger = (min, max) => {
-        return Math.floor(Math.random() * (max - min)) + min
     }
 
     /**
@@ -195,13 +185,6 @@ class RandomDateSampler {
 
             this._isError = true
             this._errorFields[+field].innerHTML = message
-        }
-
-        // get the number of the month by providing the month as a 3 characters string
-        let monthNumberFromString = str => {
-            return new Date(`${str} 01 2000`).toLocaleDateString(`en`, {
-                month: `2-digit`,
-            })
         }
 
         const output = []

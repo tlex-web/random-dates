@@ -42,13 +42,20 @@ form.addEventListener('submit', e => {
     outputList.innerHTML = html_output.join(' ')
 
     // reformat the data for export
-    const prepDataExport = dates.map(e => e.toString().slice(0, 16))
+    const prepDataExport = dates.map(
+        e =>
+            `${e.toString().slice(8, 10)}/${monthNumberFromString(
+                e.toString().slice(4, 8)
+            )}/${e.toString().slice(11, 16)}`
+    )
 
     // different export types
     clipboard.addEventListener('click', async e => {
         e.preventDefault()
 
-        await navigator.clipboard.writeText(prepDataExport)
+        await navigator.clipboard.writeText(
+            prepDataExport.join(' ,').replaceAll(' ,', '')
+        )
 
         clipboard.innerHTML = 'Copied to clipboard'
     })
@@ -56,7 +63,10 @@ form.addEventListener('submit', e => {
     txt.addEventListener('click', async e => {
         e.preventDefault()
 
-        saveDataAsTXT('random_dates.txt', prepDataExport)
+        saveDataAsTXT(
+            'random_dates.txt',
+            prepDataExport.join(' ,').replaceAll(' ,', '')
+        )
     })
 
     csv.addEventListener('click', async e => {
