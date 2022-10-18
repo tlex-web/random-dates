@@ -1,41 +1,5 @@
 'use-strict'
 
-class DateError extends Error {
-    /**
-     * Custom error class for the random date application
-     * gets the number of the field where the error occurs
-     * to show the message in the frontend
-     * @param {String} message
-     * @param {Number | Number[]} field
-     */
-    constructor(message, field) {
-        super(message)
-
-        this.field = field
-    }
-}
-
-/**
- * get the number of the month by providing the month as a 3 characters string
- * @param {String} month
- * @returns Number
- */
-let monthNumberFromString = month => {
-    return new Date(`${month} 01 2000`).toLocaleDateString(`en`, {
-        month: `2-digit`,
-    })
-}
-
-/**
- * Generate a random number between two numbers, including min and excluding max
- * @param {Number} min
- * @param {Number} max
- * @returns Number
- */
-const getRandomInteger = (min, max) => {
-    return Math.floor(Math.random() * (max - min)) + min
-}
-
 class RandomDateSampler {
     /**
      * Random date constructor class
@@ -50,7 +14,8 @@ class RandomDateSampler {
             start.value.length !== 0 ? new Date(String(start.value)) : undefined
         this._end =
             end.value.length !== 0 ? new Date(String(end.value)) : undefined
-        this._batchSize = +batchSize.value
+        this._batchSize =
+            +batchSize.value <= 0 ? Math.abs(batchSize.value) : +batchSize.value
         this._weekend = weekend.checked ? true : false
         this._errorFields = errorFields
         this._batch = []

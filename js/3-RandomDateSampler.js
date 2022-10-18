@@ -14,7 +14,8 @@ class RandomDateSampler {
             start.value.length !== 0 ? new Date(String(start.value)) : undefined
         this._end =
             end.value.length !== 0 ? new Date(String(end.value)) : undefined
-        this._batchSize = +batchSize.value
+        this._batchSize =
+            +batchSize.value <= 0 ? Math.abs(batchSize.value) : +batchSize.value
         this._weekend = weekend.checked ? true : false
         this._errorFields = errorFields
         this._batch = []
