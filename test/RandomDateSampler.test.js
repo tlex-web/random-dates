@@ -1,12 +1,10 @@
 const assert = require('node:assert').strict
-const RandomDateSampler = require('../dev/src/js/RandomDateSampler')
-
-const randInt = RandomDateSampler.getRandomInteger
-const createRanB = RandomDateSampler.createRandomBatch
+const { getRandomInteger } = require('../js/2-helpers')
+const createRanB = require('../js/3-RandomDateSampler')
 
 describe('integration test', function () {
     it('getRandomInteger should only return numbers between min and not max', function () {
-        let i = randInt(1, 10)
+        let i = getRandomInteger(1, 10)
 
         assert.deepStrictEqual(i, 5)
     })
@@ -16,6 +14,6 @@ describe('integration test', function () {
         let n = 2
         let r = [new Date(), new Date()]
 
-        assert.deepStrictEqual(createRanB(d, n), r)
+        assert.deepStrictEqual(createRanB.createRandomBatch(d, n), r)
     })
 })
