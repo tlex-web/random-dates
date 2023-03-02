@@ -119,7 +119,6 @@ class RandomDateSampler {
                 this._errorFields[n].innerHTML = message
             }
         }
-
         if (this._isError) return false
         else return true
     }
@@ -169,19 +168,11 @@ class RandomDateSampler {
      * @returns Dates[]
      */
     createRandomSampleBatch = (dates, n) => {
-        // const even = len % 2 === 0 ? true : false
-
-        // if (!even) {
-        //     const rest = 1
-
-        //     len = len - rest
-        // }
-
         let batch = []
         let seeds = []
         let availableDates = dates.length
 
-        for (let i = 1; i <= availableDates; ++i) {
+        while (true) {
             const seed = getRandomInteger(0, availableDates)
 
             // Check if the index of the date has already been picked,
@@ -358,13 +349,24 @@ const saveDataAsCSV = (filename, data) => {
 
 // under development
 const saveDataAsXlsx = data => {
+    function b64DecodeUnicode(str) {
+        // Going backwards: from bytestream, to percent-encoding, to original string.
+        return decodeURIComponent(
+            atob(str)
+                .split('')
+                .map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                })
+                .join('')
+        )
+    }
     function s2ab(s) {
         const buffer = new ArrayBuffer(s.length)
         const view = new Uint8Array(buffer)
         for (let i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xff
         return buffer
     }
-    const blob = new Blob([s2ab(atob(data))], {
+    const blob = new Blob([s2ab(b64DecodeUnicode(data))], {
         type: '',
     })
 
