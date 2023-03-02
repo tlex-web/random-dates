@@ -180,7 +180,9 @@ class RandomDateSampler {
                 this._weekend
             )
 
-            batch = this.createRandomSampleBatch(dates, this._batchSize)
+            batch = this.createRandomSampleBatch(dates, this._batchSize).sort(
+                (a, b) => a - b
+            )
         } catch (error) {
             const { message, field } = error
 
