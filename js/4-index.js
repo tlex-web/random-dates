@@ -117,13 +117,24 @@ const saveDataAsCSV = (filename, data) => {
 
 // under development
 const saveDataAsXlsx = data => {
+    function b64DecodeUnicode(str) {
+        // Going backwards: from bytestream, to percent-encoding, to original string.
+        return decodeURIComponent(
+            atob(str)
+                .split('')
+                .map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                })
+                .join('')
+        )
+    }
     function s2ab(s) {
         const buffer = new ArrayBuffer(s.length)
         const view = new Uint8Array(buffer)
         for (let i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xff
         return buffer
     }
-    const blob = new Blob([s2ab(atob(data))], {
+    const blob = new Blob([s2ab(b64DecodeUnicode(data))], {
         type: '',
     })
 

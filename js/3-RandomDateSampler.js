@@ -84,7 +84,6 @@ class RandomDateSampler {
                 this._errorFields[n].innerHTML = message
             }
         }
-
         if (this._isError) return false
         else return true
     }
@@ -134,19 +133,11 @@ class RandomDateSampler {
      * @returns Dates[]
      */
     createRandomSampleBatch = (dates, n) => {
-        // const even = len % 2 === 0 ? true : false
-
-        // if (!even) {
-        //     const rest = 1
-
-        //     len = len - rest
-        // }
-
         let batch = []
         let seeds = []
         let availableDates = dates.length
 
-        for (let i = 1; i <= availableDates; ++i) {
+        while (true) {
             const seed = getRandomInteger(0, availableDates)
 
             // Check if the index of the date has already been picked,
