@@ -21,7 +21,9 @@ let outputDir = 'js/main.js'
                     fs.writeFile(outputDir, data, err => {
                         if (err) throw err
                     })
-                    const stream = fs.createWriteStream(outputDir)
+                    const stream = fs.createWriteStream(outputDir, {
+                        flags: 'w',
+                    })
 
                     stream.on('error', err => {
                         throw err

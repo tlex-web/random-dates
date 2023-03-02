@@ -4,6 +4,7 @@
     "description": "application to create a batch of random dates",
     "main": "index.js",
     "scripts": {
+        "eslint": "eslint --init",
         "test": "mocha ./test/RandomDateSampler.test.js",
         "compile": "terser js/main.js -o ./dist/src/js/main.min.js -c -m --source-map",
         "create-main-file": "node createIndexFile.js"
@@ -19,6 +20,7 @@
     },
     "homepage": "https://github.com/itauditresources/random-dates#readme",
     "devDependencies": {
+        "eslint": "^8.35.0",
         "mocha": "^10.0.0",
         "request": "^2.88.2"
     }
