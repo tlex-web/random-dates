@@ -347,26 +347,22 @@ const saveDataAsCSV = (filename, data) => {
     }
 }
 
-// under development
+/**
+ * Function to export data as a xlsx file in the browser
+ * @param {String[]} data
+ */
 const saveDataAsXlsx = data => {
-    function b64DecodeUnicode(str) {
-        // Going backwards: from bytestream, to percent-encoding, to original string.
-        return decodeURIComponent(
-            atob(str)
-                .split('')
-                .map(function (c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-                })
-                .join('')
-        )
+    // convert string to array buffer
+    const str2ab = str => {
+        const buf = new ArrayBuffer(str.length * 2) // 2 bytes for each char
+        const bufView = new Uint16Array(buf)
+        for (let i = 0, strLen = str.length; i < strLen; i++) {
+            bufView[i] = str.charCodeAt(i)
+        }
+        return buf
     }
-    function s2ab(s) {
-        const buffer = new ArrayBuffer(s.length)
-        const view = new Uint8Array(buffer)
-        for (let i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xff
-        return buffer
-    }
-    const blob = new Blob([s2ab(b64DecodeUnicode(data))], {
+
+    const blob = new Blob([str2ab(b64DecodeUnicode(data))], {
         type: '',
     })
 
