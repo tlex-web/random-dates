@@ -1,6 +1,6 @@
 const assert = require('node:assert').strict
-const { getRandomInteger } = require('../js/2-helpers')
-const createRanB = require('../js/3-RandomDateSampler')
+const { getRandomInteger } = require('../js/main')
+const createRanB = require('../js/main')
 
 describe('integration test', function () {
     it('getRandomInteger should only return numbers between min and not max', function () {

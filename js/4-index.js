@@ -1,12 +1,11 @@
-'use-strict'
-
 // Import all HTML elements
 const form = document.querySelector('form')
 const outputList = document.querySelector('.output-list')
 const submitBtn = document.querySelector('button[type="submit"]')
 const clipboard = document.querySelector('#clipboard')
-const txt = document.querySelector('#txt')
-const csv = document.querySelector('#csv')
+const txtBtn = document.querySelector('#txtBtn')
+const csvBtn = document.querySelector('#csvBtn')
+const jsonBtn = document.querySelector('#jsonBtn')
 const outputField = document.querySelectorAll('.hidden')
 const errorFields = document.querySelectorAll('.error')
 
@@ -46,7 +45,7 @@ form.addEventListener('submit', e => {
         e =>
             `${e.toString().slice(8, 10)}/${monthNumberFromString(
                 e.toString().slice(4, 8)
-            )}/${e.toString().slice(11, 16)}`
+            )}/${e.toString().slice(11, 15)}`
     )
 
     // different export types
@@ -54,27 +53,36 @@ form.addEventListener('submit', e => {
         e.preventDefault()
 
         await navigator.clipboard.writeText(
-            prepDataExport.join(' ,').replaceAll(' ,', '')
+            prepDataExport.join(',').replace(/,/g, ' ')
         )
 
         clipboard.innerHTML = 'Copied to clipboard'
     })
 
-    txt.addEventListener('click', async e => {
+    txtBtn.addEventListener('click', e => {
         e.preventDefault()
 
         saveDataAsTXT(
             'random_dates.txt',
-            prepDataExport.join(' ,').replaceAll(' ,', '')
+            prepDataExport.join(',').replaceAll(/,/g, ' ')
         )
     })
 
-    csv.addEventListener('click', async e => {
+    csvBtn.addEventListener('click', e => {
         e.preventDefault()
 
         saveDataAsCSV(
             'random_dates.csv',
-            prepDataExport.join(' ,').replaceAll(' ,', ';')
+            prepDataExport.join(',').replaceAll(/,/g, ' ')
+        )
+    })
+
+    jsonBtn.addEventListener('click', e => {
+        e.preventDefault()
+
+        saveDataAsJSON(
+            'random_dates.json',
+            JSON.stringify({ dates: prepDataExport })
         )
     })
 })
@@ -115,30 +123,26 @@ const saveDataAsCSV = (filename, data) => {
     }
 }
 
-// under development
-const saveDataAsXlsx = data => {
-    function b64DecodeUnicode(str) {
-        // Going backwards: from bytestream, to percent-encoding, to original string.
-        return decodeURIComponent(
-            atob(str)
-                .split('')
-                .map(function (c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-                })
-                .join('')
-        )
-    }
-    function s2ab(s) {
-        const buffer = new ArrayBuffer(s.length)
-        const view = new Uint8Array(buffer)
-        for (let i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xff
-        return buffer
-    }
-    const blob = new Blob([s2ab(b64DecodeUnicode(data))], {
-        type: '',
+/**
+ * Function to export data as a json file in the browser
+ * @param {String[]} data
+ */
+const saveDataAsJSON = (filename, data) => {
+    const blob = new Blob([data], {
+        type: 'text/json;charset=utf-8',
     })
 
-    href = URL.createObjectURL(blob)
+    if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, filename)
+    } else {
+        const tmpAnchor = window.document.createElement('a')
+        tmpAnchor.href = window.URL.createObjectURL(blob, {
+            oneTimeOnly: true,
+        })
+        tmpAnchor.download = filename
+        tmpAnchor.click()
+        URL.revokeObjectURL(tmpAnchor.href)
+    }
 }
 
 // throws unsafe environment errors

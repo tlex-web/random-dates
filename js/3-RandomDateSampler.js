@@ -1,5 +1,3 @@
-'use-strict'
-
 class RandomDateSampler {
     /**
      * Random date constructor class
@@ -137,6 +135,7 @@ class RandomDateSampler {
         let seeds = []
         let availableDates = dates.length
 
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             const seed = getRandomInteger(0, availableDates)
 
@@ -156,6 +155,26 @@ class RandomDateSampler {
             )
 
         return batch
+    }
+
+    // fetch public holidays from the API
+    fetchPublicHolidays = async () => {
+        const currentYear = new Date().getFullYear()
+
+        const url = `https://date.nager.at/api/v2/publicholidays/${String(
+            currentYear
+        )}/LU`
+
+        const response = await fetch(url)
+        const data = await response.json()
+
+        let holidays = []
+
+        for (let i = 0; i < data.length; ++i) {
+            holidays[i] = new Date(data[i].date)
+        }
+
+        console.log(holidays)
     }
 
     /**
