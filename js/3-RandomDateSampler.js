@@ -8,15 +8,13 @@ class RandomDateSampler {
      * @param {NodeList} errorFields
      */
     constructor(start, end, batchSize, weekend, errorFields) {
-        this._start =
-            start.value.length !== 0 ? new Date(String(start.value)) : undefined
-        this._end =
-            end.value.length !== 0 ? new Date(String(end.value)) : undefined
-        this._batchSize =
-            +batchSize.value <= 0 ? Math.abs(batchSize.value) : +batchSize.value
+        this._start = start.value.length !== 0 ? new Date(String(start.value)) : undefined
+        this._end = end.value.length !== 0 ? new Date(String(end.value)) : undefined
+        this._batchSize = +batchSize.value <= 0 ? Math.abs(batchSize.value) : +batchSize.value
         this._weekend = weekend.checked ? true : false
         this._errorFields = errorFields
         this._batch = []
+        this._holidays = []
         this._output = []
         this._isError = false
     }
@@ -33,33 +31,18 @@ class RandomDateSampler {
         // check if the end date is greater than the start date
         if (this._start.valueOf() > this._end.valueOf())
             throw new DateError(
-                `${this._end
-                    .toString()
-                    .slice(0, 10)} needs to be greater than ${this._start
-                    .toString()
-                    .slice(0, 10)}`,
+                `${this._end.toString().slice(0, 10)} needs to be greater than ${this._start.toString().slice(0, 10)}`,
                 [0, 1]
             )
 
         // check if the dates have the same value
-        if (+this._start === +this._end)
-            throw new DateError('Define a valid range', [0, 1])
+        if (+this._start === +this._end) throw new DateError('Define a valid range', [0, 1])
 
         // check if a number is provided
-        if (this._batchSize <= 0)
-            throw new DateError('Sample needs to be greater than 0', 2)
+        if (this._batchSize <= 0) throw new DateError('Sample needs to be greater than 0', 2)
 
-        if (
-            this.getDatesInRange(
-                new Date(this._start),
-                new Date(this._end),
-                this._weekend
-            ).length < this._batchSize
-        )
-            throw new DateError(
-                'Extend the time frame or pick a lower sample size',
-                [0, 1, 2, 3]
-            )
+        if (this.getDatesInRange(new Date(this._start), new Date(this._end), this._weekend).length < this._batchSize)
+            throw new DateError('Extend the time frame or pick a lower sample size', [0, 1, 2, 3])
     }
 
     init() {
@@ -98,30 +81,38 @@ class RandomDateSampler {
      * @returns Date[]
      */
     getDatesInRange = (start, end, excludeWeekend) => {
-        if (typeof start !== 'object') throw new Error('DateType')
-        if (typeof end !== 'object') throw new Error('DateType')
+        if (typeof start !== 'object') throw new DateError('DateType', 1)
+        if (typeof end !== 'object') throw new DateError('DateType', 2)
 
         const arr = []
 
-        for (
-            let dt = new Date(start);
-            dt <= new Date(end);
-            dt.setDate(dt.getDate() + 1)
-        ) {
+        for (let dt = new Date(start); dt <= new Date(end); dt.setDate(dt.getDate() + 1)) {
             if (excludeWeekend) {
-                if (
-                    dt.toString().slice(0, 3) !== 'Sat' &&
-                    dt.toString().slice(0, 3) !== 'Sun'
-                )
-                    arr.push(new Date(dt))
+                if (dt.toString().slice(0, 3) !== 'Sat' && dt.toString().slice(0, 3) !== 'Sun') arr.push(new Date(dt))
             } else {
                 arr.push(new Date(dt))
             }
+
+            if (!arr?.length) throw new DateError("Couldn't create batch", 2)
         }
+        // Filter out public holidays
+        let filteredDates = []
 
-        if (!arr?.length) throw new DateError("Couldn't create batch", 2)
+        this.fetchPublicHolidays().then(holidays => {
+            for (let date of arr) {
+                for (let holiday of holidays) {
+                    if (date.valueOf() !== holiday.valueOf() && !filteredDates.includes(date)) {
+                        filteredDates.push(date)
 
-        return arr
+                        console.log(filteredDates)
+                    }
+                }
+            }
+        })
+
+        console.log(filteredDates)
+
+        this._holidays = filteredDates
     }
 
     /**
@@ -133,11 +124,11 @@ class RandomDateSampler {
     createRandomSampleBatch = (dates, n) => {
         let batch = []
         let seeds = []
-        let availableDates = dates.length
+        let numDates = dates.length
 
         // eslint-disable-next-line no-constant-condition
         while (true) {
-            const seed = getRandomInteger(0, availableDates)
+            const seed = getRandomInteger(0, numDates)
 
             // Check if the index of the date has already been picked,
             // since the filtering for dates is a unreliable
@@ -148,25 +139,23 @@ class RandomDateSampler {
             seeds.push(seed)
         }
 
-        if (batch.length !== n)
-            throw new DateError(
-                'Extend the time frame or pick a lower sample size',
-                2
-            )
+        if (batch.length !== n) throw new DateError('Extend the time frame or pick a lower sample size', 2)
 
         return batch
     }
 
-    // fetch public holidays from the API
-    fetchPublicHolidays = async () => {
-        const currentYear = new Date().getFullYear()
+    /**
+     * Fetch public holidays from a public API and return them inside a promise
+     * @param {Number} year
+     * @returns Promise
+     */
+    fetchPublicHolidays = async year => {
+        const currentYear = new Date(year).getFullYear()
 
-        const url = `https://date.nager.at/api/v2/publicholidays/${String(
-            currentYear
-        )}/LU`
+        const url = `https://date.nager.at/api/v2/publicholidays/${String(currentYear)}/LU`
 
-        const response = await fetch(url)
-        const data = await response.json()
+        const res = await fetch(url)
+        const data = await res.json()
 
         let holidays = []
 
@@ -174,7 +163,7 @@ class RandomDateSampler {
             holidays[i] = new Date(data[i].date)
         }
 
-        console.log(holidays)
+        return holidays
     }
 
     /**
@@ -184,15 +173,9 @@ class RandomDateSampler {
     createOutput = () => {
         let batch = []
         try {
-            const dates = this.getDatesInRange(
-                new Date(this._start),
-                new Date(this._end),
-                this._weekend
-            )
+            const dates = this.getDatesInRange(new Date(this._start), new Date(this._end), this._weekend)
 
-            batch = this.createRandomSampleBatch(dates, this._batchSize).sort(
-                (a, b) => a - b
-            )
+            batch = this.createRandomSampleBatch(dates, this._batchSize).sort((a, b) => a - b)
         } catch (error) {
             const { message, field } = error
 
@@ -203,9 +186,7 @@ class RandomDateSampler {
         const output = []
 
         batch.forEach(date => {
-            let reformattedDate = `${date
-                .toString()
-                .slice(8, 10)}/${monthNumberFromString(
+            let reformattedDate = `${date.toString().slice(8, 10)}/${monthNumberFromString(
                 date.toString().slice(4, 8)
             )}/${date.toString().slice(11, 16)}`
 

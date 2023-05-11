@@ -6,16 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
-            rel="stylesheet"
-        />
+        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="../dist/src/css/style.css" />
-        <link
-            rel="icon"
-            type="image/x-icon"
-            href="./src/img/AVEGA-Favicon.jpg"
-        />
+        <link rel="icon" type="image/x-icon" href="./src/img/AVEGA-Favicon.jpg" />
         <title>Random Date Sampling - Test</title>
     </head>
 
@@ -29,44 +22,22 @@
                     <form class="form">
                         <div class="input-container">
                             <label for="startDate">Start Date:</label>
-                            <input
-                                type="date"
-                                name="startDate"
-                                id="startDate"
-                                required
-                            />
+                            <input type="date" name="startDate" id="startDate" required />
                             <span class="error"></span>
                         </div>
                         <div class="input-container">
                             <label for="endDate">End Date:</label>
-                            <input
-                                type="date"
-                                name="endDate"
-                                id="endDate"
-                                required
-                            />
+                            <input type="date" name="endDate" id="endDate" required />
                             <span class="error"></span>
                         </div>
                         <div class="input-container">
                             <label for="batchSize">Batch size:</label>
-                            <input
-                                type="number"
-                                name="batchSize"
-                                id="batchSize"
-                                placeholder="0"
-                                min="0"
-                                required
-                            />
+                            <input type="number" name="batchSize" id="batchSize" placeholder="0" min="0" required />
                             <span class="error"></span>
                         </div>
-                        <div class="input-container">
-                            <label for="weekend">Exclude weekend days:</label>
-                            <input
-                                type="checkbox"
-                                name="weekend"
-                                id="weekend"
-                                checked
-                            />
+                        <div class="input-container slider-checkbox">
+                            <input type="checkbox" name="weekend" id="weekend" checked />
+                            <label class="label" for="weekend">Exclude weekend days:</label>
                             <span class="error"></span>
                         </div>
                         <div class="input-btn">

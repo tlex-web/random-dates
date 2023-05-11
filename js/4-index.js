@@ -14,14 +14,10 @@ form.addEventListener('submit', e => {
 
     const { startDate, endDate, batchSize, weekend } = e.target
 
-    const randomDate = new RandomDateSampler(
-        startDate,
-        endDate,
-        batchSize,
-        weekend,
-        errorFields
-    )
+    const randomDate = new RandomDateSampler(startDate, endDate, batchSize, weekend, errorFields)
     const initialize = randomDate.init()
+
+    console.log(randomDate.getDatesInRange(new Date.now(), new Date.now() + 360000, true))
 
     // exit event after unsuccessful initialization
     if (!initialize) return
@@ -33,8 +29,7 @@ form.addEventListener('submit', e => {
     // show output field
     if (!randomDate.error || !dates?.length) {
         outputField.forEach(field => {
-            if (field.classList.contains('hidden'))
-                field.classList.remove('hidden')
+            if (field.classList.contains('hidden')) field.classList.remove('hidden')
         })
     }
 
@@ -43,18 +38,16 @@ form.addEventListener('submit', e => {
     // reformat the data for export
     const prepDataExport = dates.map(
         e =>
-            `${e.toString().slice(8, 10)}/${monthNumberFromString(
-                e.toString().slice(4, 8)
-            )}/${e.toString().slice(11, 15)}`
+            `${e.toString().slice(8, 10)}/${monthNumberFromString(e.toString().slice(4, 8))}/${e
+                .toString()
+                .slice(11, 15)}`
     )
 
     // different export types
     clipboard.addEventListener('click', async e => {
         e.preventDefault()
 
-        await navigator.clipboard.writeText(
-            prepDataExport.join(',').replace(/,/g, ' ')
-        )
+        await navigator.clipboard.writeText(prepDataExport.join(',').replace(/,/g, ' '))
 
         clipboard.innerHTML = 'Copied to clipboard'
     })
@@ -62,28 +55,19 @@ form.addEventListener('submit', e => {
     txtBtn.addEventListener('click', e => {
         e.preventDefault()
 
-        saveDataAsTXT(
-            'random_dates.txt',
-            prepDataExport.join(',').replaceAll(/,/g, ' ')
-        )
+        saveDataAsTXT('random_dates.txt', prepDataExport.join(',').replaceAll(/,/g, ' '))
     })
 
     csvBtn.addEventListener('click', e => {
         e.preventDefault()
 
-        saveDataAsCSV(
-            'random_dates.csv',
-            prepDataExport.join(',').replaceAll(/,/g, ' ')
-        )
+        saveDataAsCSV('random_dates.csv', prepDataExport.join(',').replaceAll(/,/g, ' '))
     })
 
     jsonBtn.addEventListener('click', e => {
         e.preventDefault()
 
-        saveDataAsJSON(
-            'random_dates.json',
-            JSON.stringify({ dates: prepDataExport })
-        )
+        saveDataAsJSON('random_dates.json', JSON.stringify({ dates: prepDataExport }))
     })
 })
 
