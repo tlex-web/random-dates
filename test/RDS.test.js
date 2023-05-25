@@ -375,19 +375,29 @@ describe('RandomDateSampler', function () {
         const result = randomDateSampler.checkInput()
         assert.equal(result.length, 1)
     })
-    it('should return an array of dates from a API call', async function () {
-        const year = 2021
+    it('fetch public holidays within the provided parameters as array', async function () {
+        const fetchPublicHolidays = async () => {
+            const country = 'LU'
+            const language = 'EN'
+            const start = '2021-01-01'
+            const end = '2021-12-31'
 
-        const start = { value: '2021-01-01' }
-        const end = { value: '2021-01-02' }
-        const batchSize = { value: 1 }
-        const weekend = { checked: false }
-        const errorFields = [{ innerHTML: '' }, { innerHTML: '' }, { innerHTML: '' }, { innerHTML: '' }]
+            const url = `https://openholidaysapi.org/PublicHolidays?countryIsoCode=${country}&languageIsoCode=${language}&validFrom=${start}&validTo=${end}`
 
-        const randomDateSampler = new RandomDateSampler(start, end, batchSize, weekend, errorFields)
+            const res = await fetch(url)
+            const data = await res.json()
 
-        const dates = await randomDateSampler.fetchPublicHolidays(year)
+            let holidays = []
 
-        assert.deepEqual(dates.length, 12)
+            for (let i = 0; i < data.length; ++i) {
+                holidays[i] = new Date(data[i].startDate)
+            }
+
+            return holidays
+        }
+
+        const holidays = await fetchPublicHolidays()
+
+        assert.deepEqual(holidays.length, 12)
     })
 })

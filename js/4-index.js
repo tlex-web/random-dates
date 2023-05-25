@@ -17,14 +17,14 @@ form.addEventListener('submit', e => {
     const randomDate = new RandomDateSampler(startDate, endDate, batchSize, weekend, errorFields)
     const initialize = randomDate.init()
 
-    console.log(randomDate.getDatesInRange(new Date.now(), new Date.now() + 360000, true))
+    console.log(initialize, randomDate._errorFields)
 
     // exit event after unsuccessful initialization
     if (!initialize) return
 
     const { html_output, dates } = randomDate.createOutput()
 
-    if (randomDate.error) location.reload()
+    //if (randomDate.error) location.reload()
 
     // show output field
     if (!randomDate.error || !dates?.length) {

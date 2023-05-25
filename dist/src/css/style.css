@@ -124,7 +124,7 @@ input {
 }
 .slider-checkbox input:checked + .label:before {
     background-color: #1877c1;
-    content: '\f00d';
+    content: '';
     padding-left: 6px;
 }
 .slider-checkbox input:checked + .label:after {
@@ -143,7 +143,7 @@ input {
     transition: background-color 0.3s, left 0.3s;
 }
 .slider-checkbox .label:before {
-    content: '\f00c';
+    content: '';
     color: #fff;
     box-sizing: border-box;
     font-family: 'FontAwesome', sans-serif;

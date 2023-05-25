@@ -98,7 +98,7 @@ class RandomDateSampler {
         // Filter out public holidays
         let filteredDates = []
 
-        this.fetchPublicHolidays().then(holidays => {
+        this.fetchPublicHolidays(2019).then(holidays => {
             for (let date of arr) {
                 for (let holiday of holidays) {
                     if (date.valueOf() !== holiday.valueOf() && !filteredDates.includes(date)) {
@@ -149,10 +149,11 @@ class RandomDateSampler {
      * @param {Number} year
      * @returns Promise
      */
-    fetchPublicHolidays = async year => {
-        const currentYear = new Date(year).getFullYear()
+    fetchPublicHolidays = async () => {
+        const country = 'LU'
+        const language = 'en'
 
-        const url = `https://date.nager.at/api/v2/publicholidays/${String(currentYear)}/LU`
+        const url = `https://openholidaysapi.org/PublicHolidays?countryIsoCode=${country}&languageIsoCode=${language}&validFrom=${this._start}&validTo=${this._end}`
 
         const res = await fetch(url)
         const data = await res.json()
