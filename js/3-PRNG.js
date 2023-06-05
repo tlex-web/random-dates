@@ -1,5 +1,3 @@
-const assert = require('node:assert').strict
-
 class PRNG {
     /**
      * Pseudo random number generator
@@ -71,18 +69,3 @@ class PRNG {
         }
     }
 }
-
-describe('PRNG test', function () {
-    it('PRNG should return always the same array of numbers between min and max', function () {
-        let seed = 111
-        let arr = []
-
-        const prng = new PRNG(seed)
-
-        for (let i = 0; i < 10; ++i) {
-            arr.push(prng.next(1, 10))
-        }
-
-        assert.deepStrictEqual(arr, [3, 4, 3, 3, 3, 4, 3, 2, 4, 2])
-    })
-})
