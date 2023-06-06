@@ -12,22 +12,21 @@ const errorFields = document.querySelectorAll('.error')
 form.addEventListener('submit', e => {
     e.preventDefault()
 
-    const { startDate, endDate, batchSize, weekend } = e.target
+    const { startDate, endDate, batchSize, seed, weekend } = e.target
 
-    const randomDate = new RandomDateSampler(startDate, endDate, batchSize, weekend, errorFields)
-    const initialize = randomDate.init()
-
-    console.log(initialize, randomDate._errorFields)
+    const randomDateSampler = new RandomDateSampler(startDate, endDate, batchSize, seed, weekend, errorFields)
+    const initialize = randomDateSampler.init()
 
     // exit event after unsuccessful initialization
     if (!initialize) return
 
-    const { html_output, dates } = randomDate.createOutput()
+    const { html_output, dates } = randomDateSampler.createOutput()
 
-    //if (randomDate.error) location.reload()
+    //if (randomDateSampler.error) location.reload()
 
     // show output field
-    if (!randomDate.error || !dates?.length) {
+    if (!randomDateSampler.error || !dates?.length) {
+        errorFields.forEach(e => (e.innerHTML = ''))
         outputField.forEach(field => {
             if (field.classList.contains('hidden')) field.classList.remove('hidden')
         })

@@ -6,7 +6,7 @@
     "scripts": {
         "eslint": "eslint --init",
         "test": "mocha ./test/*.test.js",
-        "compile": "terser js/main.js -o ./dist/src/js/main.min.js -c -m --source-map",
+        "compile": "terser main.js -o ./dist/src/js/main.min.js -c -m --source-map",
         "create-main-file": "node createIndexFile.js"
     },
     "repository": {

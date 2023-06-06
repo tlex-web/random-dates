@@ -1,5 +1,3 @@
 
 
-for %f in (./js/*.js) do (
-    type %f >> merged.js
-)
+find . -maxdepth 2 -type f -name '*.js' -exec cat {} + >> main.js

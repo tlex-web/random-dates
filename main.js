@@ -1,5 +1,4 @@
-// Description: This file contains the unit tests for the Random Date Sampler application.
-const assert = require('node:assert').strict
+'use-strict'
 
 class DateError extends Error {
     /**
@@ -15,7 +14,6 @@ class DateError extends Error {
         this.field = field
     }
 }
-
 /**
  * get the number of the month by providing the month as a 3 characters string
  * @param {String} month
@@ -37,6 +35,30 @@ const getRandomInteger = (min, max) => {
     return Math.floor(Math.random() * (max - min)) + min
 }
 
+/**
+ * Fetch public holidays from a public API and return them inside a promise
+ * @param {Number} year
+ * @returns Promise
+ */
+const fetchPublicHolidays = async () => {
+    const country = 'LU'
+    const language = 'EN'
+    const start = '2021-01-01'
+    const end = '2021-12-31'
+
+    const url = `https://openholidaysapi.org/PublicHolidays?countryIsoCode=${country}&languageIsoCode=${language}&validFrom=${start}&validTo=${end}`
+
+    const res = await fetch(url)
+    const data = await res.json()
+
+    let holidays = []
+
+    for (let i = 0; i < data.length; ++i) {
+        holidays[i] = new Date(data[i].startDate)
+    }
+
+    return holidays
+}
 class PRNG {
     /**
      * Pseudo random number generator
@@ -108,7 +130,6 @@ class PRNG {
         }
     }
 }
-
 class RandomDateSampler {
     /**
      * Random date constructor class
@@ -280,251 +301,135 @@ class RandomDateSampler {
         return { html_output: output, dates: batch }
     }
 }
+// Import all HTML elements
+const form = document.querySelector('form')
+const outputList = document.querySelector('.output-list')
+const submitBtn = document.querySelector('button[type="submit"]')
+const clipboard = document.querySelector('#clipboard')
+const txtBtn = document.querySelector('#txtBtn')
+const csvBtn = document.querySelector('#csvBtn')
+const jsonBtn = document.querySelector('#jsonBtn')
+const outputField = document.querySelectorAll('.hidden')
+const errorFields = document.querySelectorAll('.error')
 
-describe('RandomDateSampler', function () {
-    it('should throw an error if no start date is provided', function () {
-        const start = { value: '' }
-        const end = { value: '2021-01-02' }
-        const batchSize = { value: 1 }
-        const weekend = { checked: false }
-        const seed = { value: 111 }
-        const errorFields = [
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-        ]
+form.addEventListener('submit', e => {
+    e.preventDefault()
 
-        const randomDateSampler = new RandomDateSampler(start, end, batchSize, seed, weekend, errorFields)
+    const { startDate, endDate, batchSize, seed, weekend } = e.target
 
-        assert.throws(
-            () => {
-                randomDateSampler.checkInput()
-            },
-            {
-                name: 'Error',
-                message: 'Provide a date',
-                field: 0,
-            }
-        )
+    const randomDateSampler = new RandomDateSampler(startDate, endDate, batchSize, seed, weekend, errorFields)
+    const initialize = randomDateSampler.init()
+
+    // exit event after unsuccessful initialization
+    if (!initialize) return
+
+    const { html_output, dates } = randomDateSampler.createOutput()
+
+    //if (randomDateSampler.error) location.reload()
+
+    // show output field
+    if (!randomDateSampler.error || !dates?.length) {
+        errorFields.forEach(e => (e.innerHTML = ''))
+        outputField.forEach(field => {
+            if (field.classList.contains('hidden')) field.classList.remove('hidden')
+        })
+    }
+
+    outputList.innerHTML = html_output.join(' ')
+
+    // reformat the data for export
+    const prepDataExport = dates.map(
+        e =>
+            `${e.toString().slice(8, 10)}/${monthNumberFromString(e.toString().slice(4, 8))}/${e
+                .toString()
+                .slice(11, 15)}`
+    )
+
+    // different export types
+    clipboard.addEventListener('click', async e => {
+        e.preventDefault()
+
+        await navigator.clipboard.writeText(prepDataExport.join(',').replace(/,/g, ' '))
+
+        clipboard.innerHTML = 'Copied to clipboard'
     })
 
-    it('should throw an error if no end date is provided', function () {
-        const start = { value: '2021-01-01' }
-        const end = { value: '' }
-        const batchSize = { value: 1 }
-        const weekend = { checked: false }
-        const seed = { value: 111 }
-        const errorFields = [
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-        ]
+    txtBtn.addEventListener('click', e => {
+        e.preventDefault()
 
-        const randomDateSampler = new RandomDateSampler(start, end, batchSize, seed, weekend, errorFields)
-
-        assert.throws(
-            () => {
-                randomDateSampler.checkInput()
-            },
-            {
-                name: 'Error',
-                message: 'Provide a date',
-                field: 1,
-            }
-        )
+        saveDataAsTXT('random_dates.txt', prepDataExport.join(',').replaceAll(/,/g, ' '))
     })
 
-    it('should throw an error if the start date is greater than the end date', function () {
-        const start = { value: '2021-01-02' }
-        const end = { value: '2021-01-01' }
-        const batchSize = { value: 1 }
-        const weekend = { checked: false }
-        const seed = { value: 111 }
-        const errorFields = [
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-        ]
+    csvBtn.addEventListener('click', e => {
+        e.preventDefault()
 
-        const randomDateSampler = new RandomDateSampler(start, end, batchSize, seed, weekend, errorFields)
-
-        assert.throws(
-            () => {
-                randomDateSampler.checkInput()
-            },
-            {
-                name: 'Error',
-                message: 'Fri Jan 01 needs to be greater than Sat Jan 02',
-                field: [0, 1],
-            }
-        )
+        saveDataAsCSV('random_dates.csv', prepDataExport.join(',').replaceAll(/,/g, ' '))
     })
 
-    it('should throw an error if the start date and end date are equal', function () {
-        const start = { value: '2021-01-01' }
-        const end = { value: '2021-01-01' }
-        const batchSize = { value: 1 }
-        const weekend = { checked: false }
-        const seed = { value: 111 }
-        const errorFields = [
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-        ]
+    jsonBtn.addEventListener('click', e => {
+        e.preventDefault()
 
-        const randomDateSampler = new RandomDateSampler(start, end, batchSize, seed, weekend, errorFields)
-
-        assert.throws(
-            () => {
-                randomDateSampler.checkInput()
-            },
-            {
-                name: 'Error',
-                message: 'Define a valid range',
-                field: [0, 1],
-            }
-        )
-    })
-    it('should throw an error if the batch size is less than 1', function () {
-        const start = { value: '2021-01-01' }
-        const end = { value: '2021-01-02' }
-        const batchSize = { value: 0 }
-        const weekend = { checked: false }
-        const seed = { value: 111 }
-        const errorFields = [
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-        ]
-
-        const randomDateSampler = new RandomDateSampler(start, end, batchSize, seed, weekend, errorFields)
-
-        assert.throws(
-            () => {
-                randomDateSampler.checkInput()
-            },
-            {
-                name: 'Error',
-                message: 'Sample needs to be greater than 0',
-                field: 2,
-            }
-        )
-    })
-    it('should throw an error if the batch size is greater than the range', function () {
-        const start = { value: '2021-01-01' }
-        const end = { value: '2021-01-02' }
-        const batchSize = { value: 3 }
-        const weekend = { checked: false }
-        const seed = { value: 111 }
-        const errorFields = [
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-        ]
-
-        const randomDateSampler = new RandomDateSampler(start, end, batchSize, seed, weekend, errorFields)
-
-        assert.throws(
-            () => {
-                randomDateSampler.checkInput()
-            },
-            {
-                name: 'Error',
-                message: 'Extend the time frame or pick a lower sample size',
-                field: [0, 1, 2, 3],
-            }
-        )
-    })
-    it('should throw an error if no seed number is provided', function () {
-        const start = { value: '2021-01-01' }
-        const end = { value: '2021-01-02' }
-        const batchSize = { value: 1 }
-        const weekend = { checked: false }
-        const seed = { value: '' }
-        const errorFields = [
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-        ]
-        const randomDateSampler = new RandomDateSampler(start, end, batchSize, seed, weekend, errorFields)
-
-        assert.throws(
-            () => {
-                randomDateSampler.checkInput()
-            },
-            {
-                name: 'Error',
-                message: 'Provide a seed number',
-                field: 4,
-            }
-        )
-    })
-    it('should always create the same bath of dates using the same seed number', function () {
-        const start = { value: '2021-01-01' }
-        const end = { value: '2021-01-31' }
-        const batchSize = { value: 5 }
-        const weekend = { checked: false }
-        const seed = { value: 111 }
-        const errorFields = [
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-        ]
-
-        const randomDateSampler = new RandomDateSampler(start, end, batchSize, seed, weekend, errorFields)
-
-        const output = randomDateSampler.createOutput()
-        console.log(output.html_output)
-
-        assert.deepEqual(output.html_output, [
-            '<li>07/01/2021 </li>',
-            '<li>08/01/2021 </li>',
-            '<li>09/01/2021 </li>',
-            '<li>10/01/2021 </li>',
-            '<li>12/01/2021 </li>',
-        ])
-    })
-    it('should fail to create the same bath of dates using a different seed number', function () {
-        const start = { value: '2021-01-01' }
-        const end = { value: '2021-01-31' }
-        const batchSize = { value: 5 }
-        const weekend = { checked: false }
-        const seed = { value: 112 }
-        const errorFields = [
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-        ]
-
-        const randomDateSampler = new RandomDateSampler(start, end, batchSize, seed, weekend, errorFields)
-
-        const output = randomDateSampler.createOutput()
-        console.log(output.html_output)
-
-        assert.notDeepEqual(output.html_output, [
-            '<li>07/01/2021 </li>',
-            '<li>08/01/2021 </li>',
-            '<li>09/01/2021 </li>',
-            '<li>10/01/2021 </li>',
-            '<li>12/01/2021 </li>',
-        ])
+        saveDataAsJSON('random_dates.json', JSON.stringify({ dates: prepDataExport }))
     })
 })
+
+/**
+ * Function to export data as a text file in the browser
+ * @param {String} filename
+ * @param {String[]} data
+ */
+const saveDataAsTXT = (filename, data) => {
+    const blob = new Blob([data], { type: 'text/plain;charset=utf-8' })
+    if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, filename)
+    } else {
+        const tmpAnchor = window.document.createElement('a')
+        tmpAnchor.href = window.URL.createObjectURL(blob, { oneTimeOnly: true })
+        tmpAnchor.download = filename
+        tmpAnchor.click()
+        URL.revokeObjectURL(tmpAnchor.href)
+    }
+}
+
+/**
+ * Function to export data as a csv file in the browser
+ * @param {String} filename
+ * @param {String[]} data
+ */
+const saveDataAsCSV = (filename, data) => {
+    const blob = new Blob([data], { type: 'text/csv;charset=utf-8' })
+    if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, filename)
+    } else {
+        const tmpAnchor = window.document.createElement('a')
+        tmpAnchor.href = window.URL.createObjectURL(blob, { oneTimeOnly: true })
+        tmpAnchor.download = filename
+        tmpAnchor.click()
+        URL.revokeObjectURL(tmpAnchor.href)
+    }
+}
+
+/**
+ * Function to export data as a json file in the browser
+ * @param {String[]} data
+ */
+const saveDataAsJSON = (filename, data) => {
+    const blob = new Blob([data], {
+        type: 'text/json;charset=utf-8',
+    })
+
+    if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, filename)
+    } else {
+        const tmpAnchor = window.document.createElement('a')
+        tmpAnchor.href = window.URL.createObjectURL(blob, {
+            oneTimeOnly: true,
+        })
+        tmpAnchor.download = filename
+        tmpAnchor.click()
+        URL.revokeObjectURL(tmpAnchor.href)
+    }
+}
+
+// throws unsafe environment errors
+//history.replaceState(null, '', '../index.html')

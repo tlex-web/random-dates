@@ -5,12 +5,16 @@ class RandomDateSampler {
      * @param {HTMLInputElement} end
      * @param {HTMLInputElement} batchSize
      * @param {HTMLInputElement} weekend
+     * @param {HTMLInputElement} seed
      * @param {NodeList} errorFields
+     * @returns RandomDateSampler
      */
-    constructor(start, end, batchSize, weekend, errorFields) {
+    constructor(start, end, batchSize, seed, weekend, errorFields) {
         this._start = start.value.length !== 0 ? new Date(String(start.value)) : undefined
         this._end = end.value.length !== 0 ? new Date(String(end.value)) : undefined
         this._batchSize = +batchSize.value <= 0 ? Math.abs(batchSize.value) : +batchSize.value
+        this._seed = +seed.value <= 0 ? Math.abs(seed.value) : +seed.value
+        this._prng = new PRNG(this._seed)
         this._weekend = weekend.checked ? true : false
         this._errorFields = errorFields
         this._batch = []
@@ -43,6 +47,12 @@ class RandomDateSampler {
 
         if (this.getDatesInRange(new Date(this._start), new Date(this._end), this._weekend).length < this._batchSize)
             throw new DateError('Extend the time frame or pick a lower sample size', [0, 1, 2, 3])
+
+        // check if the seed is provided
+        if (!this._seed) throw new DateError('Provide a seed number', 4)
+
+        // check if the seed is a number
+        if (isNaN(this._seed)) throw new DateError('Seed is not a number', 4)
     }
 
     init() {
@@ -70,7 +80,7 @@ class RandomDateSampler {
     }
 
     print() {
-        return [this._start, this._end, this._weekend, this._batchSize]
+        return [this._start, this._end, this._seed, this._weekend, this._batchSize, this._errorFields]
     }
 
     /**
@@ -95,24 +105,8 @@ class RandomDateSampler {
 
             if (!arr?.length) throw new DateError("Couldn't create batch", 2)
         }
-        // Filter out public holidays
-        let filteredDates = []
 
-        this.fetchPublicHolidays(2019).then(holidays => {
-            for (let date of arr) {
-                for (let holiday of holidays) {
-                    if (date.valueOf() !== holiday.valueOf() && !filteredDates.includes(date)) {
-                        filteredDates.push(date)
-
-                        console.log(filteredDates)
-                    }
-                }
-            }
-        })
-
-        console.log(filteredDates)
-
-        this._holidays = filteredDates
+        return arr
     }
 
     /**
@@ -126,12 +120,11 @@ class RandomDateSampler {
         let seeds = []
         let numDates = dates.length
 
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-            const seed = getRandomInteger(0, numDates)
+        for (let i = 0; i < numDates; i++) {
+            const seed = this._prng.next(0, numDates - 1)
 
             // Check if the index of the date has already been picked,
-            // since the filtering for dates is a unreliable
+            // since the filtering for dates is unreliable
             if (!seeds.includes(seed)) batch.push(dates[seed])
 
             if (batch.length === n) break
@@ -142,29 +135,6 @@ class RandomDateSampler {
         if (batch.length !== n) throw new DateError('Extend the time frame or pick a lower sample size', 2)
 
         return batch
-    }
-
-    /**
-     * Fetch public holidays from a public API and return them inside a promise
-     * @param {Number} year
-     * @returns Promise
-     */
-    fetchPublicHolidays = async () => {
-        const country = 'LU'
-        const language = 'en'
-
-        const url = `https://openholidaysapi.org/PublicHolidays?countryIsoCode=${country}&languageIsoCode=${language}&validFrom=${this._start}&validTo=${this._end}`
-
-        const res = await fetch(url)
-        const data = await res.json()
-
-        let holidays = []
-
-        for (let i = 0; i < data.length; ++i) {
-            holidays[i] = new Date(data[i].date)
-        }
-
-        return holidays
     }
 
     /**
@@ -181,7 +151,9 @@ class RandomDateSampler {
             const { message, field } = error
 
             this._isError = true
-            this._errorFields[+field].innerHTML = message
+
+            if (!message || !field) throw new DateError(`${error}`, 2)
+            else this._errorFields[+field].innerHTML = message
         }
 
         const output = []

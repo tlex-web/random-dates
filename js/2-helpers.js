@@ -19,46 +19,27 @@ const getRandomInteger = (min, max) => {
     return Math.floor(Math.random() * (max - min)) + min
 }
 
-class PRNG {
-    /**
-     * Pseudo random number generator
-     * @param {Number} seed
-     * @returns Instance of PRNG
-     * @see https://en.wikipedia.org/wiki/Pseudorandom_number_generator
-     */
-    constructor(seed) {
-        this._seed = seed
-        this._modulus = 2147483647
-        this._multiplier = 48271
-        this._quotient = Math.floor(this._modulus / this._multiplier)
-        this._remainder = this._modulus % this._multiplier
+/**
+ * Fetch public holidays from a public API and return them inside a promise
+ * @param {Number} year
+ * @returns Promise
+ */
+const fetchPublicHolidays = async () => {
+    const country = 'LU'
+    const language = 'EN'
+    const start = '2021-01-01'
+    const end = '2021-12-31'
+
+    const url = `https://openholidaysapi.org/PublicHolidays?countryIsoCode=${country}&languageIsoCode=${language}&validFrom=${start}&validTo=${end}`
+
+    const res = await fetch(url)
+    const data = await res.json()
+
+    let holidays = []
+
+    for (let i = 0; i < data.length; ++i) {
+        holidays[i] = new Date(data[i].startDate)
     }
 
-    /**
-     * Generate a random number between two numbers, including min and excluding max
-     * @param {Number} min
-     * @param {Number} max
-     * @returns Number
-     */
-    next(min, max) {
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-            const product = this._multiplier * this._seed
-            const remainder = product % this._modulus
-
-            if (product > this._quotient * this._remainder + remainder) {
-                this._seed = remainder - this._modulus + this._remainder
-            } else {
-                this._seed = remainder
-            }
-
-            if (this._seed === this._modulus - 1) {
-                return this.next(min, max)
-            }
-
-            const result = Math.floor((this._seed / this._modulus) * (max - min + 1) + min)
-
-            return result
-        }
-    }
+    return holidays
 }
