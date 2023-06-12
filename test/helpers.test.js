@@ -35,7 +35,7 @@ const fetchPublicHolidays = async () => {
     return holidays
 }
 
-describe('helper function test', function () {
+describe('helper function tests', function () {
     it('getRandomInteger should only return numbers between min and not max', function () {
         let i = getRandomInteger(1, 10)
 

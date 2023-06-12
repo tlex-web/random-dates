@@ -18,37 +18,45 @@
                 <h1 class="title">Random Dates Sampler</h1>
                 <div class="content-input">
                     <form class="form">
-                        <input type="date" name="startDate" id="startDate" class="input" required />
-                        <label for="startDate">Start Date:</label>
-                        <span class="error"></span>
-
-                        <input type="date" name="endDate" id="endDate" class="input" required />
-                        <label for="endDate">End Date:</label>
-                        <span class="error"></span>
-
-                        <input
-                            type="number"
-                            name="batchSize"
-                            id="batchSize"
-                            placeholder="0"
-                            min="0"
-                            class="input"
-                            required
-                        />
-                        <label for="batchSize">Batch size:</label>
-                        <span class="error"></span>
-
-                        <input type="checkbox" name="weekend" id="weekend" class="input" checked required />
-                        <label for="weekend"><span class="ui"></span>Exclude weekends:</label>
-                        <span class="error"></span>
-
-                        <input type="number" name="seed" id="seed" placeholder="0" min="0" class="input" required />
-                        <label for="seed">Seed:</label>
+                        <div class="input-btn">
+                            <label for="startDate">Start Date:</label>
+                            <input type="date" name="startDate" id="startDate" class="input" required />
+                        </div>
                         <span class="error"></span>
 
                         <div class="input-btn">
-                            <button type="submit" class="btn">Submit</button>
+                            <label for="endDate">End Date:</label>
+                            <input type="date" name="endDate" id="endDate" class="input" required />
                         </div>
+                        <span class="error"></span>
+
+                        <div class="input-btn">
+                            <label for="batchSize">Batch size:</label>
+                            <input
+                                type="number"
+                                name="batchSize"
+                                id="batchSize"
+                                placeholder="0"
+                                min="0"
+                                class="input"
+                                required
+                            />
+                        </div>
+                        <span class="error"></span>
+
+                        <div class="input-btn">
+                            <input type="checkbox" name="weekend" id="weekend" class="input" checked required />
+                            <label for="weekend"><span class="ui"></span>Exclude weekends:</label>
+                        </div>
+                        <span class="error"></span>
+
+                        <div class="input-btn">
+                            <label for="seed">Seed:</label>
+                            <input type="number" name="seed" id="seed" placeholder="0" min="0" class="input" required />
+                        </div>
+                        <span class="error"></span>
+
+                        <button type="submit" class="btn btn-submit">Submit</button>
                         <span class="error"></span>
                     </form>
                 </div>

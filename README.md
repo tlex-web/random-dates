@@ -16,11 +16,15 @@
 
     All tests were written using the mocha framework. To run all tests in the test folder use `npm run tests`
 
-4. Minimize JS
+4. Merge JS files into one
 
-    To minimize the JavaScript code inside the _index.js_ file and create a source map for debugging run `npm run compile`
+    To merge all JavaScript files into one run `.\mergeFiles.sh`
 
-5. Dev Dependencies
+5. Minimize JS
+
+    To minimize the JavaScript code inside the _main.js_ file and create a source map for debugging run `npm run compile`
+
+6. Dev Dependencies
     - eslint
     - mocha
     - request
