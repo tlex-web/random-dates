@@ -5,17 +5,19 @@ class RandomDateSampler {
      * @param {HTMLInputElement} end
      * @param {HTMLInputElement} batchSize
      * @param {HTMLInputElement} weekend
+     * @param {HTMLInputElement} holidays
      * @param {HTMLInputElement} seed
      * @param {NodeList} errorFields
      * @returns RandomDateSampler
      */
-    constructor(start, end, batchSize, seed, weekend, errorFields) {
+    constructor(start, end, batchSize, weekend, holidays, seed, errorFields) {
         this._start = start.value.length !== 0 ? new Date(String(start.value)) : undefined
         this._end = end.value.length !== 0 ? new Date(String(end.value)) : undefined
         this._batchSize = +batchSize.value <= 0 ? Math.abs(batchSize.value) : +batchSize.value
         this._seed = +seed.value <= 0 ? Math.abs(seed.value) : +seed.value
         this._prng = new PRNG(this._seed)
         this._weekend = weekend.checked ? true : false
+        this._holidays = holidays.checked ? true : false
         this._errorFields = errorFields
         this._batch = []
         this._holidays = []
@@ -48,11 +50,15 @@ class RandomDateSampler {
         if (this.getDatesInRange(new Date(this._start), new Date(this._end), this._weekend).length < this._batchSize)
             throw new DateError('Extend the time frame or pick a lower sample size', [0, 1, 2, 3])
 
-        // check if the seed is provided
-        if (!this._seed) throw new DateError('Provide a seed number', 4)
+        if (this._holidays.length > 0) throw new DateError('Holidays are not implemented yet', 4)
 
-        // check if the seed is a number
-        if (isNaN(this._seed)) throw new DateError('Seed is not a number', 4)
+        // check if the seed is provided
+        if (!this._seed) throw new DateError('Provide a seed number', 5)
+
+        if (this._seed <= 0) throw new DateError('Seed needs to be greater than 0', 5)
+
+        // 4294967295 = 2^32 - 1
+        if (this._seed > 4294967295) throw new DateError('Seed needs to be smaller than 4294967295', 5)
     }
 
     init() {
@@ -115,7 +121,9 @@ class RandomDateSampler {
      * @param {Number} n
      * @returns Dates[]
      */
-    createRandomSampleBatch = (dates, n) => {
+    createRandomSampleBatch = async (dates, n) => {
+        const holidays = await fetchPublicHolidays('LU', reformatDate(this._start), reformatDate(this._end))
+
         let batch = []
         let seeds = []
         let numDates = dates.length
@@ -123,9 +131,14 @@ class RandomDateSampler {
         for (let i = 0; i < numDates; i++) {
             const seed = this._prng.next(0, numDates - 1)
 
-            // Check if the index of the date has already been picked,
-            // since the filtering for dates is unreliable
-            if (!seeds.includes(seed)) batch.push(dates[seed])
+            // If true, check if the date is a not a holiday
+            if (this._holidays) {
+                if (!holidays.includes(dates[seed]) && !seeds.includes(seed)) batch.push(dates[seed])
+            } else {
+                // Check if the index of the date has already been picked,
+                // since the filtering for dates is unreliable
+                if (!seeds.includes(seed)) batch.push(dates[seed])
+            }
 
             if (batch.length === n) break
 
@@ -141,12 +154,12 @@ class RandomDateSampler {
      * Create the output element containing the date batch
      * @returns Object with the HTML elements and the raw dates array
      */
-    createOutput = () => {
+    createOutput = async () => {
         let batch = []
         try {
             const dates = this.getDatesInRange(new Date(this._start), new Date(this._end), this._weekend)
 
-            batch = this.createRandomSampleBatch(dates, this._batchSize).sort((a, b) => a - b)
+            batch = await this.createRandomSampleBatch(dates, this._batchSize).sort((a, b) => a - b)
         } catch (error) {
             const { message, field } = error
 
@@ -158,13 +171,7 @@ class RandomDateSampler {
 
         const output = []
 
-        batch.forEach(date => {
-            let reformattedDate = `${date.toString().slice(8, 10)}/${monthNumberFromString(
-                date.toString().slice(4, 8)
-            )}/${date.toString().slice(11, 16)}`
-
-            output.push(`<li>${reformattedDate}</li>`)
-        })
+        batch.forEach(date => output.push(`<li>${reformatDate(date)}</li>`))
 
         return { html_output: output, dates: batch }
     }

@@ -61,6 +61,15 @@ const fetchPublicHolidays = async (country, start, end) => {
     return holidays
 }
 
+/**
+ * Format a date to a string
+ * @param {Date} date
+ * @returns String
+ */
+const reformatDate = date => {
+    return date.toLocaleDateString('en-CA')
+}
+
 class PRNG {
     /**
      * Pseudo random number generator
@@ -145,7 +154,7 @@ class RandomDateSampler {
      * @param {NodeList} errorFields
      * @returns RandomDateSampler
      */
-    constructor(start, end, batchSize, seed, weekend, holidays, errorFields) {
+    constructor(start, end, batchSize, weekend, holidays, seed, errorFields) {
         this._start = start.value.length !== 0 ? new Date(String(start.value)) : undefined
         this._end = end.value.length !== 0 ? new Date(String(end.value)) : undefined
         this._batchSize = +batchSize.value <= 0 ? Math.abs(batchSize.value) : +batchSize.value
@@ -185,11 +194,15 @@ class RandomDateSampler {
         if (this.getDatesInRange(new Date(this._start), new Date(this._end), this._weekend).length < this._batchSize)
             throw new DateError('Extend the time frame or pick a lower sample size', [0, 1, 2, 3])
 
-        // check if the seed is provided
-        if (!this._seed) throw new DateError('Provide a seed number', 4)
+        // check if the weekend checkbox is checked
+        if (this._holidays instanceof Boolean) throw new DateError('Holidays are not implemented yet', 4)
 
-        // check if the seed is a number
-        if (isNaN(this._seed)) throw new DateError('Seed is not a number', 4)
+        // check if the seed number is greater than 0
+        if (this._seed <= 0) throw new DateError('Seed number needs to be greater than 0', 5)
+
+        // 4294967295 = 2^32 - 1
+        // check if the seed number is smaller than 4294967295
+        if (this._seed > 4294967295) throw new DateError('Seed needs to be smaller than 4294967295', 5)
     }
 
     init() {
@@ -253,7 +266,7 @@ class RandomDateSampler {
      * @returns Dates[]
      */
     createRandomSampleBatch = async (dates, n) => {
-        const holidays = await fetchPublicHolidays('LU', new Date(this._start), new Date(this._end))
+        const holidays = await fetchPublicHolidays('LU', reformatDate(this._start), reformatDate(this._end))
 
         let batch = []
         let seeds = []
@@ -263,13 +276,13 @@ class RandomDateSampler {
             const seed = this._prng.next(0, numDates - 1)
 
             // If true, check if the date is a not a holiday
-            if (this._holidays && !seeds.includes(seed)) {
-                if (!holidays.includes(dates[seed])) batch.push(dates[seed])
+            if (this._holidays) {
+                if (!holidays.includes(dates[seed]) && !seeds.includes(seed)) batch.push(dates[seed])
+            } else {
+                // Check if the index of the date has already been picked,
+                // since the filtering for dates is unreliable
+                if (!seeds.includes(seed)) batch.push(dates[seed])
             }
-
-            // Check if the index of the date has already been picked,
-            // since the filtering for dates is unreliable
-            if (!this.holiday && !seeds.includes(seed)) batch.push(dates[seed])
 
             if (batch.length === n) break
 
@@ -277,7 +290,6 @@ class RandomDateSampler {
         }
 
         if (batch.length !== n) throw new DateError('Extend the time frame or pick a lower sample size', 2)
-        console.log(batch)
 
         return batch
     }
@@ -303,19 +315,13 @@ class RandomDateSampler {
 
         const output = []
 
-        batch.forEach(date => {
-            let reformattedDate = `${date.toString().slice(8, 10)}/${monthNumberFromString(
-                date.toString().slice(4, 8)
-            )}/${date.toString().slice(11, 16)}`
-
-            output.push(`<li>${reformattedDate}</li>`)
-        })
+        batch.forEach(date => output.push(`<li>${reformatDate(date)}</li>`))
 
         return { html_output: output, dates: batch }
     }
 }
 
-describe('RandomDateSampler class method tests', function () {
+describe('RandomDateSampler class method tests - checkInput', function () {
     it('should throw an error if no start date is provided', function () {
         const start = { value: '' }
         const end = { value: '2021-01-02' }
@@ -509,8 +515,8 @@ describe('RandomDateSampler class method tests', function () {
             },
             {
                 name: 'Error',
-                message: 'Provide a seed number',
-                field: 4,
+                message: 'Seed number needs to be greater than 0',
+                field: 5,
             }
         )
     })
@@ -537,7 +543,7 @@ describe('RandomDateSampler class method tests', function () {
             {
                 name: 'Error',
                 message: 'Provide a seed number',
-                field: 4,
+                field: 5,
             }
         )
     })
@@ -547,7 +553,7 @@ describe('RandomDateSampler class method tests', function () {
         const batchSize = { value: 1 }
         const weekend = { checked: false }
         const holidays = { checked: false }
-        const seed = { value: -1 }
+        const seed = { value: 0 }
         const errorFields = [
             { innerHTML: '' },
             { innerHTML: '' },
@@ -563,18 +569,18 @@ describe('RandomDateSampler class method tests', function () {
             },
             {
                 name: 'Error',
-                message: 'Provide a seed number',
-                field: 4,
+                message: 'Seed number needs to be greater than 0',
+                field: 5,
             }
         )
     })
-    it('should throw an error if the seed number is greater than 999999999', function () {
+    it('should throw an error if the seed number is greater than 4294967295', function () {
         const start = { value: '2021-01-01' }
         const end = { value: '2021-01-02' }
         const batchSize = { value: 1 }
         const weekend = { checked: false }
         const holidays = { checked: false }
-        const seed = { value: 1000000000 }
+        const seed = { value: 4294967296 }
         const errorFields = [
             { innerHTML: '' },
             { innerHTML: '' },
@@ -590,34 +596,14 @@ describe('RandomDateSampler class method tests', function () {
             },
             {
                 name: 'Error',
-                message: 'Provide a seed number',
-                field: 4,
+                message: 'Seed needs to be smaller than 4294967295',
+                field: 5,
             }
         )
     })
-    it('should successfully create a batch without public holidays', async function () {
-        const start = { value: '2021-01-01' }
-        const end = { value: '2021-01-31' }
-        const batchSize = { value: 5 }
-        const weekend = { checked: false }
-        const holidays = { checked: false }
-        const seed = { value: 111 }
-        const errorFields = [
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-            { innerHTML: '' },
-        ]
+})
 
-        const randomDateSampler = new RandomDateSampler(start, end, batchSize, weekend, holidays, seed, errorFields)
-
-        const output = await randomDateSampler.createRandomSampleBatch(
-            ['07/01/2021', '08/01/2021', '09/01/2021', '10/01/2021', '11/01/2021'],
-            3
-        )
-        assert.deepEqual(output, ['07/01/2021', '08/01/2021', '09/01/2021'])
-    })
+describe('RandomDateSampler class tests - createOutput', function () {
     it('should always create the same bath of dates using the same seed number', async function () {
         const start = { value: '2021-01-01' }
         const end = { value: '2021-01-31' }
@@ -664,7 +650,6 @@ describe('RandomDateSampler class method tests', function () {
         const randomDateSampler = new RandomDateSampler(start, end, batchSize, weekend, holidays, seed, errorFields)
 
         const output = await randomDateSampler.createOutput()
-        console.log(output.html_output)
 
         assert.notDeepEqual(output.html_output, [
             '<li>07/01/2021 </li>',
@@ -673,5 +658,31 @@ describe('RandomDateSampler class method tests', function () {
             '<li>10/01/2021 </li>',
             '<li>12/01/2021 </li>',
         ])
+    })
+})
+
+describe('RandomDateSampler class tests - createRandomSampleBatch', function () {
+    it('should successfully create a batch without public holidays', async function () {
+        const start = { value: '2021-01-01' }
+        const end = { value: '2021-01-31' }
+        const batchSize = { value: 5 }
+        const weekend = { checked: false }
+        const holidays = { checked: false }
+        const seed = { value: 111 }
+        const errorFields = [
+            { innerHTML: '' },
+            { innerHTML: '' },
+            { innerHTML: '' },
+            { innerHTML: '' },
+            { innerHTML: '' },
+        ]
+
+        const randomDateSampler = new RandomDateSampler(start, end, batchSize, weekend, holidays, seed, errorFields)
+
+        const output = await randomDateSampler.createRandomSampleBatch(
+            ['07/01/2021', '08/01/2021', '09/01/2021', '10/01/2021', '11/01/2021'],
+            3
+        )
+        assert.deepEqual(output, ['07/01/2021', '08/01/2021', '09/01/2021'])
     })
 })

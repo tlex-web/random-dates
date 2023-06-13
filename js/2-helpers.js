@@ -20,15 +20,23 @@ const getRandomInteger = (min, max) => {
 }
 
 /**
- * Fetch public holidays from a public API and return them inside a promise
- * @param {Number} year
- * @returns Promise
+ * Format a date to a string
+ * @param {Date} date
+ * @returns String
  */
-const fetchPublicHolidays = async () => {
-    const country = 'LU'
+const reformatDate = date => {
+    return date.toLocaleDateString('en-CA')
+}
+
+/**
+ * Fetch public holidays from a public API and return them inside a promise
+ * @param {String} country
+ * @param {Date} start
+ * @param {Date} end
+ * @returns Promise<Date[]>
+ */
+const fetchPublicHolidays = async (country, start, end) => {
     const language = 'EN'
-    const start = '2021-01-01'
-    const end = '2021-12-31'
 
     const url = `https://openholidaysapi.org/PublicHolidays?countryIsoCode=${country}&languageIsoCode=${language}&validFrom=${start}&validTo=${end}`
 

@@ -12,9 +12,9 @@ const errorFields = document.querySelectorAll('.error')
 form.addEventListener('submit', e => {
     e.preventDefault()
 
-    const { startDate, endDate, batchSize, seed, weekend } = e.target
+    const { startDate, endDate, batchSize, weekend, holidays, seed } = e.target
 
-    const randomDateSampler = new RandomDateSampler(startDate, endDate, batchSize, seed, weekend, errorFields)
+    const randomDateSampler = new RandomDateSampler(startDate, endDate, batchSize, weekend, holidays, seed, errorFields)
     const initialize = randomDateSampler.init()
 
     // exit event after unsuccessful initialization
