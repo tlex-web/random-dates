@@ -108,9 +108,9 @@ class RandomDateSampler {
             } else {
                 arr.push(new Date(dt))
             }
-
-            if (!arr?.length) throw new DateError("Couldn't create batch", 2)
         }
+
+        if (arr.length === 0) throw new DateError('Extend the time frame or pick a lower sample size', 2)
 
         return arr
     }
@@ -123,6 +123,8 @@ class RandomDateSampler {
      */
     createRandomSampleBatch = async (dates, n) => {
         const holidays = await fetchPublicHolidays('LU', reformatDate(this._start), reformatDate(this._end))
+
+        if (holidays.length === 0) throw new DateError('Could not fetch public holidays', (1, 2, 3, 4))
 
         let batch = []
         let seeds = []
@@ -145,7 +147,8 @@ class RandomDateSampler {
             seeds.push(seed)
         }
 
-        if (batch.length !== n) throw new DateError('Extend the time frame or pick a lower sample size', 2)
+        if (batch.length !== n || batch.length === 0)
+            throw new DateError('Extend the time frame or pick a lower sample size', 2)
 
         return batch
     }
